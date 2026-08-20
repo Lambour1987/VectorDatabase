@@ -1,0 +1,13 @@
+//20-8-2026: toegevoegd aan gitignore
+
+# CMake build directory
+Build/
+build/
+
+# Compiled files
+*.exe
+*.obj
+*.o
+
+# Visual Studio Code
+.vscode/
