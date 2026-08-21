@@ -16,7 +16,9 @@ add_executable(VectorDatabase
 src/main.cpp 
 src/Vector.cpp
 src/VectorDatabase.cpp
-src/Input.cpp)
+src/Input.cpp
+src/DatabaseInput.cpp
+src/DatabaseQuery.cpp)
 
 
 # Als je naar headerbestanden zoek, kijk dan ook in include.
