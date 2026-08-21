@@ -4,10 +4,21 @@
 //Om runtime errors op te vangen
 #include <stdexcept>
 
-//20-8-26: inclusief algorithm
 #include <algorithm>
+#include <queue>
 
 using namespace std;
+
+//20-8-26: hier een struct: niet ni de header. Omdat het alleen een hulpmiddel is voor de implementatie van findNearestK
+struct CompareDistance
+{
+    bool operator()(const NearestResult& a, const NearestResult& b) const
+    {
+        return a.distance<b.distance;
+    }
+};
+
+
 
 void VectorDatabase::add(const Vector& vector)
 {
@@ -25,6 +36,9 @@ const Vector& VectorDatabase::get(std::size_t index) const
 {
     return vectors.at(index);
 }
+
+
+
 
 // 19-8-26: Functie die dichtsbijzijnde vector binnen de Vectorendatabase zoekt
 // de functie findNearest krijgt als parameter query, waarbij query een referentie is naar een Vector en die
@@ -71,6 +85,7 @@ NearestResult VectorDatabase::findNearest(const Vector&query) const
     return result; 
 }
 
+
 //19-8-26: Maak een functie findNearestK die als input een referentie naar een vector heeft die niet te wijzigen is en noem
 // hem query en een variabele k van het type size_t. Als output een vector van dichtsbijzijnde resultaten
 std::vector<NearestResult> VectorDatabase::findNearestK(const Vector& query, size_t k) const
@@ -90,7 +105,9 @@ std::vector<NearestResult> VectorDatabase::findNearestK(const Vector& query, siz
     }
 
     //Maak een variabele results van het type Vector en gebruik Nearest Results als datatype
-    vector<NearestResult> results;
+    //20-8-26: Vervangen omdat we nu een heap gaan vector<NearestResult> results;
+    priority_queue<NearestResult, vector<NearestResult>,CompareDistance> heap;
+
     //Loop door de vector omvang heen 
     for(size_t i = 0; i < vectors.size();i++)
     {
@@ -109,18 +126,28 @@ std::vector<NearestResult> VectorDatabase::findNearestK(const Vector& query, siz
         // Dus hier geven we het adres van de Vector op index i door aan result.vector.
         NearestResult result{&vectors.at(i), distance};
         
-        //voeg resultaat toe aan vector result
-        results.push_back(result);
+        //voeg resultaat toe aan heap result
+        heap.push(result);
+        //20-8-26: wordt een heap results.push_back(result);
+        //Als heap groter is dan k
+        if(heap.size()>k)
+        {
+            //Haal top eraf en push
+            heap.pop();
+        }
     }
 
-    //20-8-26: BruteForceSorteren met lambda expression: als a.distance kleiner is dan b.distance, dan moet a voor b komen.
-    std::sort(results.begin(),results.end(),[](const NearestResult& a, const NearestResult& b){return a.distance< b.distance;});
+    std::vector<NearestResult> results;
 
-    if(k<results.size())
+    while(!heap.empty())
     {
-        results.resize(k);
+        results.push_back(heap.top());
+        heap.pop();
     }
 
+    //20-8-2026: Sorteren bruteforce met lambda expression eruit, want we gebruiken een heap
+    //20-8-2026: Reverse functie nu gebruiken om de resultatne om te draaien
+    reverse(results.begin(), results.end());
     // retourneer resultaat
     return results;
 

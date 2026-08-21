@@ -2,6 +2,7 @@
 
 #include "../include/Vector.h"
 #include "../include/VectorDatabase.h"
+#include "../include/Input.h"
 
 //Voor throw exception, try en catch()
 #include <stdexcept>
@@ -13,40 +14,6 @@
 
 using namespace std;
 
-// Helperfunctie 1
-// We geven een referentie door naar prompt en die mag niet worden aangepast.
-double vraagDouble(const string& prompt)
-{
-    double waarde;
-
-    cout<<"Geef een waarde: ";
-
-    while(!(cin>>waarde))
-    {
-        cout<<"Ongeldige invoer. Probeer opnieuw: ";
-
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    }
-    return waarde;
-}
-
-// Helperfunctie 2
-int vraagInt(const string& prompt)
-{
-    int waarde;
-
-    cout<<prompt;
-
-    while(!(cin>>waarde))
-    {
-        cout<<"Ongeldige invoer. Probeer opnieuw: ";
-
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    }
-    return waarde;
-}
 
 int main()
 {
@@ -55,6 +22,13 @@ int main()
 
     //Vraag hoeveel vectors de gebruiker wil invoeren
     int aantalVectors = vraagInt("Hoeveel vectors wil je invoeren? ");
+
+    //20-8-26: controle
+    if(aantalVectors <= 0)
+    {
+        cout << "Aantal vectors moet groter zijn dan 0." << endl;
+        return 1;
+    }
 
     // Bepaalt hoevel vectors in de database komen
     for(int i = 0; i < aantalVectors; i++)

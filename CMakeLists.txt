@@ -15,7 +15,8 @@ set(CMAKE_CXX_STANDARD 17)
 add_executable(VectorDatabase 
 src/main.cpp 
 src/Vector.cpp
-src/VectorDatabase.cpp)
+src/VectorDatabase.cpp
+src/Input.cpp)
 
 
 # Als je naar headerbestanden zoek, kijk dan ook in include.

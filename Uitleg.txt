@@ -1,0 +1,969 @@
+20-8-2026: uitleg over bepaalde ontwerpkeuzes
+
+# Vector Database — Theorie en gedachtegang
+
+## 1. Wat is een Vector?
+
+Een Vector is in ons programma een object dat een aantal `double`-waarden bevat.
+
+Bijvoorbeeld:
+
+```text
+[20, 30, 5]
+```
+
+Deze vector heeft 3 dimensies.
+
+In onze `Vector`-class bewaren we de waarden intern als:
+
+```cpp
+std::vector<double> values;
+```
+
+De waarden zitten `private`, zodat ze niet zomaar van buitenaf gewijzigd kunnen worden.
+
+We gebruiken functies zoals:
+
+```cpp
+dimension()
+at(index)
+distanceTo(other)
+```
+
+om met de vector te werken.
+
+---
+
+## 2. Wat is een VectorDatabase?
+
+De `VectorDatabase` bevat meerdere Vector-objecten:
+
+```cpp
+std::vector<Vector> vectors;
+```
+
+Je kunt dit zien als:
+
+```text
+Database
+│
+├── Vector 1 → [20, 30, 5]
+├── Vector 2 → [80, 48, 65]
+├── Vector 3 → [564, 86, 56]
+├── Vector 4 → [45, 64, 565]
+└── Vector 5 → [540, 56, 56]
+```
+
+We hebben dus eigenlijk een `vector` van `Vector`-objecten.
+
+---
+
+## 3. Referenties en pointers
+
+Een referentie en een pointer kunnen allebei gebruikt worden om niet telkens een heel object te kopiëren.
+
+### Referentie
+
+```cpp
+const Vector& v
+```
+
+Dit betekent:
+
+"v is een andere naam voor een bestaand Vector-object."
+
+De referentie blijft verwijzen naar hetzelfde object, ook als de inhoud van dat object verandert.
+
+### Pointer
+
+```cpp
+const Vector* v
+```
+
+Dit betekent:
+
+"v bevat het geheugenadres van een Vector-object."
+
+Bijvoorbeeld:
+
+```cpp
+&vectors.at(i)
+```
+
+De `&` betekent hier:
+
+"geef mij het adres van dit object."
+
+Dat is iets anders dan:
+
+```cpp
+Vector&
+```
+
+waar `&` onderdeel is van het referentietype.
+
+Bij een pointer gebruiken we vervolgens `->`:
+
+```cpp
+result.vector->dimension()
+result.vector->at(i)
+```
+
+---
+
+## 4. Waarom gebruiken we pointers in NearestResult?
+
+Ons resultaat bevat:
+
+```text
+Vector + afstand
+```
+
+Bijvoorbeeld:
+
+```text
+Vector: [20,30,5]
+Afstand: 47.95
+```
+
+In plaats van de hele Vector te kopiëren, bewaren we een pointer naar de bestaande Vector in de database.
+
+Conceptueel:
+
+```text
+vectors
+│
+├── Vector A [20,30,5]  ←────────┐
+├── Vector B [80,48,65]          │
+├── Vector C [564,86,56]         │
+└── ...                          │
+                                  │
+NearestResult ─── pointer ───────┘
+                 + afstand
+```
+
+De Vector zelf blijft dus in de database.
+
+`NearestResult` bewaart alleen het adres ervan plus de afstand.
+
+---
+
+# 5. Hoe bepalen we "dichtstbij"?
+
+We gebruiken Euclidische afstand.
+
+Voor twee vectoren:
+
+```text
+A = [a1,a2,a3]
+B = [b1,b2,b3]
+```
+
+berekenen we:
+
+```text
+sqrt(
+    (a1-b1)² +
+    (a2-b2)² +
+    (a3-b3)²
+)
+```
+
+Dit doen we in:
+
+```cpp
+distanceTo()
+```
+
+De uitkomst is een `double`.
+
+Belangrijk:
+
+De `NearestResult` bevat dus niet "de formule".
+
+Het resultaat is bijvoorbeeld:
+
+```text
+pointer naar Vector [20,30,5]
+distance = 47.9479
+```
+
+---
+
+# 6. FindNearest
+
+Voor één nearest vector is een heap helemaal niet nodig.
+
+We kunnen gewoon alle vectors één voor één bekijken:
+
+```text
+Vector 1 → afstand 47
+Vector 2 → afstand 55
+Vector 3 → afstand 600
+Vector 4 → afstand 500
+...
+```
+
+We bewaren steeds de kleinste afstand die we tot nu toe gevonden hebben.
+
+Dit is:
+
+```text
+O(N)
+```
+
+waarbij N het aantal vectors in de database is.
+
+---
+
+# 7. Waarom is FindNearestK interessanter?
+
+Stel:
+
+```text
+Database = 1.000.000 vectors
+k = 5
+```
+
+We willen alleen de 5 dichtstbijzijnde vectors.
+
+Een simpele aanpak zou zijn:
+
+1. Bereken alle 1.000.000 afstanden.
+2. Sorteer alle 1.000.000 resultaten.
+3. Pak de eerste 5.
+
+Het probleem zit vooral in het sorteren.
+
+Volledig sorteren kost:
+
+```text
+O(N log N)
+```
+
+Terwijl we uiteindelijk maar 5 resultaten nodig hebben.
+
+---
+
+# 8. De heap-oplossing
+
+Daarom gebruiken we een heap.
+
+We bekijken nog steeds alle vectors en moeten dus alle afstanden berekenen.
+
+Dat blijft:
+
+```text
+O(N)
+```
+
+Maar we bewaren niet alle resultaten.
+
+We bewaren maximaal `k` resultaten in een heap.
+
+Bijvoorbeeld:
+
+```text
+N = 1.000.000
+k = 5
+```
+
+Dan bevat onze heap nooit meer dan 5 resultaten.
+
+---
+
+# 9. Waarom een MAX-heap?
+
+Dit is een belangrijk punt.
+
+We willen de `k` kleinste afstanden bewaren.
+
+Daarom willen we bovenaan juist de **grootste van onze huidige k afstanden** hebben.
+
+Voorbeeld:
+
+```text
+k = 3
+```
+
+We hebben momenteel:
+
+```text
+10
+20
+30
+```
+
+De heap ziet conceptueel uit als:
+
+```text
+      30
+     /  \
+   10    20
+```
+
+De grootste van onze drie staat bovenaan.
+
+Nu vinden we een nieuwe afstand:
+
+```text
+15
+```
+
+Die is kleiner dan 30.
+
+Dus:
+
+```text
+30 eruit
+15 erin
+```
+
+We houden:
+
+```text
+10
+15
+20
+```
+
+We hebben dus steeds de 3 kleinste afstanden behouden.
+
+---
+
+# 10. Waarom geen MIN-heap?
+
+Een min-heap zou de kleinste afstand bovenaan hebben.
+
+Dat klinkt in eerste instantie logisch.
+
+Maar dat is niet wat we tijdens het zoeken nodig hebben.
+
+We willen weten:
+
+"Welke van mijn huidige k kandidaten is de slechtste kandidaat?"
+
+Dat is de grootste afstand.
+
+Als er een nieuwe, kleinere afstand komt, moeten we juist die slechtste kandidaat verwijderen.
+
+Daarom gebruiken we een MAX-heap.
+
+```text
+MAX-heap
+   ↓
+grootste van onze huidige k kandidaten
+```
+
+Die kunnen we direct verwijderen met:
+
+```cpp
+heap.pop();
+```
+
+---
+
+# 11. Wat gebeurt er tijdens findNearestK?
+
+Stel:
+
+```text
+k = 3
+```
+
+We krijgen afstanden:
+
+```text
+50
+20
+80
+10
+40
+15
+5
+```
+
+Stap voor stap:
+
+```text
+50
+```
+
+Heap:
+
+```text
+50
+```
+
+---
+
+```text
+20
+```
+
+Heap:
+
+```text
+20
+50
+```
+
+---
+
+```text
+80
+```
+
+Heap:
+
+```text
+20
+50
+80
+```
+
+---
+
+Nieuwe afstand:
+
+```text
+10
+```
+
+Heap wordt tijdelijk:
+
+```text
+10
+20
+50
+80
+```
+
+Maar we mogen maximaal 3 bewaren.
+
+Dus de grootste:
+
+```text
+80
+```
+
+gaat eruit.
+
+Over:
+
+```text
+10
+20
+50
+```
+
+---
+
+Nieuwe afstand:
+
+```text
+40
+```
+
+De 40 komt erbij.
+
+Dan verwijderen we weer de grootste:
+
+```text
+50
+```
+
+Over:
+
+```text
+10
+20
+40
+```
+
+---
+
+Nieuwe afstand:
+
+```text
+15
+```
+
+Dan verwijderen we:
+
+```text
+40
+```
+
+Over:
+
+```text
+10
+15
+20
+```
+
+---
+
+Nieuwe afstand:
+
+```text
+5
+```
+
+Dan verwijderen we:
+
+```text
+20
+```
+
+Uiteindelijk hebben we:
+
+```text
+5
+10
+15
+```
+
+Dat zijn de 3 kleinste afstanden.
+
+---
+
+# 12. Complexiteit
+
+Voor iedere vector moeten we de afstand berekenen.
+
+Dat kost:
+
+```text
+O(N)
+```
+
+Voor iedere kandidaat die we in de heap stoppen, kost toevoegen/verwijderen:
+
+```text
+O(log K)
+```
+
+Omdat de heap maximaal `K` elementen bevat.
+
+Daarom:
+
+```text
+O(N log K)
+```
+
+Dit is gunstiger dan:
+
+```text
+O(N log N)
+```
+
+als `K` veel kleiner is dan `N`.
+
+Bijvoorbeeld:
+
+```text
+N = 1.000.000
+K = 5
+```
+
+Dan hoeven we geen miljoen resultaten volledig te sorteren.
+
+---
+
+# 13. Heap bouwen is dus niet O(1)
+
+Een heap is niet "gewoon O(1)".
+
+Belangrijk onderscheid:
+
+```text
+heap.top()   → O(1)
+heap.push()  → O(log K)
+heap.pop()   → O(log K)
+```
+
+De grootste waarde kunnen bekijken is dus O(1).
+
+Maar een element toevoegen of verwijderen kan O(log K) kosten omdat de heap opnieuw zijn structuur moet herstellen.
+
+---
+
+# 14. Waarom hoeven we niet alles te sorteren?
+
+Na afloop hebben we bijvoorbeeld:
+
+```text
+[5, 10, 15, 20]
+```
+
+in de heap, waarbij 20 bovenaan staat.
+
+De heap garandeert echter niet dat alles volledig gesorteerd staat.
+
+Hij garandeert alleen de heap-eigenschap:
+
+```text
+grootste element bovenaan
+```
+
+Als we de resultaten uit de heap halen:
+
+```cpp
+heap.top()
+heap.pop()
+```
+
+krijgen we:
+
+```text
+20
+15
+10
+5
+```
+
+Dat is aflopend.
+
+Als we ze uiteindelijk willen tonen als:
+
+```text
+5
+10
+15
+20
+```
+
+kunnen we ze simpelweg omdraaien.
+
+Dat is `reverse`, geen `sort`.
+
+---
+
+# 15. Reverse versus sort
+
+Dit verschil is belangrijk.
+
+### Sort
+
+Bijvoorbeeld:
+
+```text
+8 2 5 1 4
+```
+
+sorteren:
+
+```text
+1 2 4 5 8
+```
+
+Je moet bepalen waar alle elementen ten opzichte van elkaar horen.
+
+Dat kost typisch:
+
+```text
+O(N log N)
+```
+
+### Reverse
+
+Als de volgorde al:
+
+```text
+8 5 4 2 1
+```
+
+is, dan kunnen we simpelweg omdraaien:
+
+```text
+1 2 4 5 8
+```
+
+Dat kost:
+
+```text
+O(N)
+```
+
+Dus `reverse` is veel eenvoudiger dan sorteren.
+
+---
+
+# 16. Belangrijke gedachte: de heap wordt pas gebruikt bij een query
+
+Onze database hoeft niet voortdurend een heap met afstanden bij te houden.
+
+Waarom?
+
+Omdat een afstand altijd afhankelijk is van een query.
+
+Bijvoorbeeld:
+
+```text
+Database:
+A
+B
+C
+D
+```
+
+Query 1:
+
+```text
+Q1
+```
+
+geeft:
+
+```text
+A → 10
+B → 50
+C → 20
+D → 80
+```
+
+Maar een andere query:
+
+```text
+Q2
+```
+
+geeft misschien:
+
+```text
+A → 70
+B → 15
+C → 90
+D → 5
+```
+
+De afstanden veranderen dus met de query.
+
+Daarom heeft het weinig zin om vooraf één algemene heap van afstanden te bouwen.
+
+---
+
+# 17. Waarom niet bij het toevoegen van vectors alle afstanden berekenen?
+
+Dat idee klinkt logisch:
+
+```text
+Vector 1 toegevoegd
+Vector 2 → afstand tot Vector 1
+Vector 3 → afstand tot Vector 1 en 2
+Vector 4 → afstand tot Vector 1, 2 en 3
+...
+```
+
+Maar dit levert afstanden tussen database-vectors op.
+
+Dat is niet automatisch wat een toekomstige query wil weten.
+
+Een toekomstige query kan bijvoorbeeld:
+
+```text
+Q = [100,200,300]
+```
+
+zijn.
+
+Dan moeten we de afstand berekenen van Q naar iedere database-vector.
+
+Dus we zouden heel veel afstanden vooraf berekenen die misschien nooit gebruikt worden.
+
+Dit kost extra geheugen en rekentijd.
+
+---
+
+# 18. Kan Dynamic Programming hierbij helpen?
+
+Waarschijnlijk niet voor het kernprobleem.
+
+Dynamic Programming is vooral nuttig wanneer deelproblemen herhaald worden en resultaten daarvan opnieuw gebruikt kunnen worden.
+
+Bij nearest-neighbor zoeken is de afstand:
+
+```text
+distance(query, vector)
+```
+
+afhankelijk van de specifieke query.
+
+Een nieuwe query verandert dus het probleem.
+
+Daarom gebruiken we hier vooralsnog:
+
+```text
+Brute Force
++
+heap voor de K beste resultaten
+```
+
+Dat is een prima eerste implementatie.
+
+---
+
+# 19. Onze huidige aanpak
+
+De huidige architectuur is ongeveer:
+
+```text
+                 VectorDatabase
+                       │
+                       │ bevat
+                       ▼
+                vector<Vector>
+                       │
+                       │
+             ┌─────────┴─────────┐
+             │                   │
+        findNearest()       findNearestK()
+             │                   │
+          O(N)              O(N log K)
+                                 │
+                                 ▼
+                              Heap
+                                 │
+                                 ▼
+                         K beste resultaten
+```
+
+---
+
+# 20. Waarom dit een goede tussenstap is
+
+We zijn begonnen met:
+
+```text
+Brute Force
++
+alles sorteren
+```
+
+Dat was eenvoudig te begrijpen.
+
+Daarna hebben we geleerd:
+
+```text
+We hebben maar K resultaten nodig.
+```
+
+Dus:
+
+```text
+niet alles bewaren
+niet alles sorteren
+```
+
+Daarom:
+
+```text
+MAX-heap van maximaal K elementen
+```
+
+Dit geeft ons:
+
+```text
+O(N log K)
+```
+
+in plaats van:
+
+```text
+O(N log N)
+```
+
+voor het selecteren van de K nearest results.
+
+---
+
+# 21. Maar er is nog een groter probleem
+
+Hoewel de heap ons helpt met het **selecteren** van de beste resultaten, moeten we nog steeds iedere database-vector bekijken.
+
+Dus bij:
+
+```text
+1.000.000 vectors
+```
+
+doen we nog steeds ongeveer:
+
+```text
+1.000.000 distance calculations
+```
+
+De heap maakt dus vooral het selectiegedeelte efficiënter.
+
+Hij voorkomt niet dat we alle vectors moeten bekijken.
+
+Daarom zijn er later datastructuren zoals:
+
+```text
+KD-tree
+Ball tree
+VP-tree
+HNSW
+en andere approximate/exact nearest-neighbor structuren
+```
+
+Die proberen juist het aantal vectors dat we daadwerkelijk moeten bekijken te verminderen.
+
+Dat is een volgende stap.
+
+---
+
+# 22. De belangrijkste inzichten
+
+De belangrijkste dingen die we tot nu toe geleerd hebben:
+
+1. Een `VectorDatabase` bevat meerdere `Vector`-objecten.
+
+2. Een `NearestResult` bevat een pointer naar een bestaande Vector plus de berekende afstand.
+
+3. `&` betekent niet altijd hetzelfde:
+
+   * `Vector&` → referentie
+   * `&vector` → adres van een object
+
+4. `->` gebruik je om via een pointer bij een object te komen.
+
+5. Voor één nearest vector is een simpele lineaire zoekactie voldoende:
+
+   ```text
+   O(N)
+   ```
+
+6. Voor K nearest vectors hoeven we niet alle N resultaten volledig te sorteren.
+
+7. We gebruiken daarom een MAX-heap met maximaal K elementen.
+
+8. De grootste afstand staat bovenaan de heap omdat dat onze slechtste huidige kandidaat is.
+
+9. Als een nieuwe afstand kleiner is dan onze slechtste kandidaat, verwijderen we de grootste.
+
+10. `heap.top()` is O(1).
+
+11. `push()` en `pop()` zijn O(log K).
+
+12. De totale aanpak voor K-nearest wordt:
+
+```text
+O(N log K)
+```
+
+13. `reverse()` is O(N) en is iets anders dan `sort()`.
+
+14. De heap wordt pas gebruikt wanneer we een query uitvoeren, omdat de afstanden afhankelijk zijn van de query.
+
+15. De heap lost niet het probleem op dat we alle vectors moeten bekijken.
+
+16. Een volgende optimalisatiestap is daarom een datastructuur waarmee we niet alle vectors hoeven te doorlopen.
+
+---
+
+# 23. Onze huidige gedachtegang in één zin
+
+> We berekenen voor een query de afstand tot alle vectors, bewaren met een MAX-heap alleen de K beste kandidaten, verwijderen steeds de slechtste kandidaat en voorkomen daarmee dat we alle N resultaten volledig hoeven te sorteren.
