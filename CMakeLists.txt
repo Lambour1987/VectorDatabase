@@ -18,7 +18,8 @@ src/Vector.cpp
 src/VectorDatabase.cpp
 src/Input.cpp
 src/DatabaseInput.cpp
-src/DatabaseQuery.cpp)
+src/DatabaseQuery.cpp
+src/MaxHeap.cpp)
 
 
 # Als je naar headerbestanden zoek, kijk dan ook in include.
