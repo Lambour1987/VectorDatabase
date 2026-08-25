@@ -7,7 +7,7 @@
 using namespace std;
 
 //Functie push van de Class Maxheap die als iput een waarde gebruikt
-void MaxHeap::push(int value)
+void MaxHeap::push(std::pair<double,const Vector*> value)
 {
     //Push waarde op de vector (achteraan)
     values.push_back(value);
@@ -21,7 +21,7 @@ void MaxHeap::push(int value)
             int ParentIndex = (ChildIndex-1)/2;
 
             //Als waarde element op ChildIndex > waarde element ParentIndex, swap
-            if(values[ChildIndex]>values[ParentIndex])
+            if(values[ChildIndex].first>values[ParentIndex].first)
             {
                 //Wissel de waarden
                 std::swap(values[ChildIndex], values[ParentIndex]);
@@ -41,7 +41,8 @@ void MaxHeap::push(int value)
 
 //Geeft de waarde van het grootste element op index 0 terug
 //Gebruik optional<int> om onderscheid te maken indien een waarde in de heap 0 is en een lege heap.
-std::optional<int> MaxHeap::top() const
+//25-8-26: van std::optional<int> MaxHeap::top() const naar
+optional<pair<double, const Vector*>> MaxHeap::top() const
 {
     // De vector values komt uit de class en is een membervariabele (dus niet als parameter meenemen)
     // Als het element op index 0 niet leeg is, 
@@ -83,7 +84,7 @@ void MaxHeap::pop()
         {
             int maxChildIndex;
             //Hier kijken of het linkerkind groter is dan het rechterkind of andersom
-            if(values[leftChild]>values[rightChild])
+            if(values[leftChild].first>values[rightChild].first)
             {
                 maxChildIndex = leftChild;
             }
@@ -92,7 +93,7 @@ void MaxHeap::pop()
                 maxChildIndex = rightChild;
             }
             //Hier kijken of het grootste kind ook groter is dan element op current index
-            if(values[maxChildIndex]>values[currentParent])
+            if(values[maxChildIndex].first>values[currentParent].first)
             {
                 swap(values[currentParent],values[maxChildIndex]);
                 //CurrentParent staat op een index
@@ -107,7 +108,7 @@ void MaxHeap::pop()
         {
 
             //Hier alleen berekenen of currentParent Groter is dan leftChild
-            if(values[leftChild]>values[currentParent])
+            if(values[leftChild].first>values[currentParent].first)
             {
                 swap(values[currentParent],values[leftChild]);
                 currentParent = leftChild;

@@ -1,5 +1,6 @@
 //18-8-2026 Gemaakt
 #include "../include/VectorDatabase.h"
+#include "../include/MaxHeap.h"
 
 //Om runtime errors op te vangen
 #include <stdexcept>
@@ -106,7 +107,8 @@ std::vector<NearestResult> VectorDatabase::findNearestK(const Vector& query, siz
 
     //Maak een variabele results van het type Vector en gebruik Nearest Results als datatype
     //20-8-26: Vervangen omdat we nu een heap gaan vector<NearestResult> results;
-    priority_queue<NearestResult, vector<NearestResult>,CompareDistance> heap;
+    //25-8-26: PQ kan eruit: priority_queue<NearestResult, vector<NearestResult>,CompareDistance> heap;
+    MaxHeap heap;
 
     //Loop door de vector omvang heen 
     for(size_t i = 0; i < vectors.size();i++)
@@ -124,10 +126,11 @@ std::vector<NearestResult> VectorDatabase::findNearestK(const Vector& query, siz
         // "geef het geheugenadres van dit object".
         // Dat adres wordt opgeslagen in de pointer.
         // Dus hier geven we het adres van de Vector op index i door aan result.vector.
-        NearestResult result{&vectors.at(i), distance};
+        // 25-8-26 kan eruit: NearestResult result{&vectors.at(i), distance};
         
         //voeg resultaat toe aan heap result
-        heap.push(result);
+        // 25-8-26: MaxHeap dus pair {} nodig ipv heap.push(result); wordt
+        heap.push({distance, &vectors.at(i)});
         //20-8-26: wordt een heap results.push_back(result);
         //Als heap groter is dan k
         if(heap.size()>k)
@@ -141,12 +144,20 @@ std::vector<NearestResult> VectorDatabase::findNearestK(const Vector& query, siz
 
     while(!heap.empty())
     {
-        results.push_back(heap.top());
-        heap.pop();
-    }
+        //25-8-26: auto result: omdat de functie top() teruggeeft: optional<pair<double, const Vector*>> MaxHeap::top() const. Dus dan is auto makkelijker
+        // en je kan aan de functie naam al zien wat het gaat worden.
+        auto result = heap.top();
 
+        //25-8-26: has_value: memberfunction van optional<int> (omdat de waarde 0 kan betekenen: 0 of ongeldig(geen waarde gevonden))
+        if(result.has_value())
+        {
+        //25-8-26: MaxHeap gebruiken dus van results.push_back(heap.top()); wordt
+            results.push_back({result->second, result->first});
+            heap.pop();
+        }
+    }
     //20-8-2026: Sorteren bruteforce met lambda expression eruit, want we gebruiken een heap
-    //20-8-2026: Reverse functie nu gebruiken om de resultatne om te draaien
+    //20-8-2026: Reverse functie nu gebruiken om de resultaten om te draaien
     reverse(results.begin(), results.end());
     // retourneer resultaat
     return results;

@@ -42,13 +42,13 @@ int main()
 
     MaxHeap heap;
 
-    heap.push(10);
-    heap.push(20);
-    heap.push(50);
-    heap.push(30);
-    heap.push(15);
-    heap.push(40);
-    heap.push(1);
+    Vector v1({1, 2, 3});
+    Vector v2({4, 5, 6});
+    Vector v3({7, 8, 9});
+
+    heap.push({10.0, &v1});
+    heap.push({20.0, &v2});
+    heap.push({50.0, &v3});
 
     while(!heap.empty())
     {
@@ -56,7 +56,7 @@ int main()
 
         if(result.has_value())
         {
-            cout << "Top: " << result.value() << endl;
+            cout << "Top distance: " << result.value().first << endl;
         }
 
         heap.pop();
