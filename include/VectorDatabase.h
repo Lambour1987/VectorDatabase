@@ -45,6 +45,8 @@ class VectorDatabase
         //19-8-2026: Functie om distance te sorteren (later heap gebruiken)
         std::vector<NearestResult> findNearestK(const Vector& query, std::size_t k) const;
 
+        //28-8-26: Functie toevoegen
+        const std::vector<Vector>& getVectors() const;
         
 };
 

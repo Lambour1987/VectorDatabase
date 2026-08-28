@@ -1,10 +1,12 @@
 //17-8-2026: 
 
 #include "../include/Vector.h"
+#include "KDTree.h"
 
 //18-8-2026: Gebruik voor throw en exception (indien we foutieve waarden in gaan voegen)
 #include <stdexcept>
 #include <cmath>
+#include <algorithm>
 
 using namespace std;
 

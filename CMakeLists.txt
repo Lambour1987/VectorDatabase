@@ -19,7 +19,8 @@ src/VectorDatabase.cpp
 src/Input.cpp
 src/DatabaseInput.cpp
 src/DatabaseQuery.cpp
-src/MaxHeap.cpp)
+src/MaxHeap.cpp
+src/KDTree.cpp)
 
 
 # Als je naar headerbestanden zoek, kijk dan ook in include.

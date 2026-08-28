@@ -6,6 +6,7 @@
 #include "../include/DatabaseInput.h"
 #include "../include/DatabaseQuery.h"
 #include "../include/MaxHeap.h"
+#include "../include/KDTree.h"
 
 
 //Voor throw exception, try en catch()
@@ -38,6 +39,9 @@ int main()
 
     cout <<"\nAantal vectors in database: "<<database.size()<<endl;
 
+    KDTree tree(database.getVectors());
+
+    tree.printTree();
     voerQueryUit(database);
 
     MaxHeap heap;

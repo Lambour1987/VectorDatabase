@@ -26,9 +26,14 @@ void VectorDatabase::add(const Vector& vector)
     vectors.push_back(vector);
 }
 
-std::size_t VectorDatabase::size() const
+size_t VectorDatabase::size() const
 {
     return vectors.size();
+}
+
+const vector<Vector>& VectorDatabase::getVectors() const
+{
+    return vectors;
 }
 
 //19-8-2026: Functie om terug te vinden in Vector
