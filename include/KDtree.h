@@ -15,6 +15,8 @@ struct KDNode
     std::size_t dimension;
 };
 
+
+
 class KDTree
 {
     private:
@@ -31,12 +33,19 @@ class KDTree
 
         void destroyTree(KDNode* node);
 
+        //28-8-26: Zoekfunctie voor de KDTree: Roep de functie nearestNeighbor op die een pointer heeft naar een KDnode genaamdnode, referentie naar een vector genaamd query
+        // en een pointer genaamd best naar een KDNode object.
+        KDNode* nearestNeighbor(KDNode* node, const Vector& query, KDNode* best);
+        
+
     public:
         KDTree(const std::vector<Vector>& vectors);
         ~KDTree();
-        
+
         //TestFunctie om te kijken of de KDTree werkt
         void printTree() const;
+        
+
         
 
 };

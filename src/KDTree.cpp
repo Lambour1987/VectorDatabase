@@ -3,6 +3,8 @@
 #include "../include/KDTree.h"
 #include <algorithm>
 #include <iostream>
+//inlcude math voor de abs functie
+#include <cmath>
 
 using namespace std;
 
@@ -115,4 +117,58 @@ void KDTree::destroyTree(KDNode* node)
     destroyTree(node->right);
 
     delete node;
+}
+
+KDNode* KDTree::nearestNeighbor(KDNode* node, const Vector& query, KDNode* best)
+{
+
+    // pointer first naar KDNode
+    KDNode* first;
+
+    // pointer second naar KDNOde
+    KDNode* second;
+
+    //Basecase: als we beneden aankomen, retourneer pointer
+    if(node == nullptr)
+    {
+        return best;
+    }
+    //Als de query op dimensie x groter dan vector op die dimensie, dan naar rechts.
+    if(query.at(node->dimension)<node->vector->at(node->dimension))
+        // Maar omdat we later eventueel nog naar links kunnen gaan 
+        {
+            first = node->left;
+            second = node->right;
+        }
+    else
+        // Anders   
+        {
+            first = node->right;
+            second = node->left;
+        }
+
+    //1-9-2: Onderzoek de kant die het dichts bij de query ligt
+    best =  nearestNeighbor(first, query, best);
+    
+    //Maak een variabele distance aan van het type double. 
+    // Dit is de afstand van de query naar de huidige node
+    double distance = query.distanceTo(*node->vector);
+
+    // Is de huidige node beter dan best?
+    if(best == nullptr || distance < query.distanceTo(*best->vector))
+    {
+        best = node;
+    }
+
+    // Afstand van query tot het splitsingsvlak
+    double planeDistance = std::abs(query.at(node->dimension)-node->vector->at(node->dimension));
+
+    // Alleen de andere kant onderzoeken als daar mogelijk een betere vector kan zitten
+    if(best == nullptr || planeDistance<query.distanceTo(*best->vector))
+    {
+        best = nearestNeighbor(second,query,best);
+    }
+
+    return best;
+
 }
