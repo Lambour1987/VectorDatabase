@@ -20,7 +20,8 @@ src/Input.cpp
 src/DatabaseInput.cpp
 src/DatabaseQuery.cpp
 src/MaxHeap.cpp
-src/KDTree.cpp)
+src/KDTree.cpp
+src/Graph.cpp)
 
 
 # Als je naar headerbestanden zoek, kijk dan ook in include.

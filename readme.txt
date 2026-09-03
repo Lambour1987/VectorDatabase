@@ -72,3 +72,25 @@ Project gestart.
 Eerste doel:
 
 **begrijpen wat vectors, similarity en nearest-neighbor search zijn en daarna een minimale Vector Database bouwen.**
+
+
+//2-9-2026:
+Termen die ik tegenkom en kan gebruiken.
+Machine Learning. Trainen Model. Embeddings (volgens mij van hoe je van woorden naar vectordatabase gaat), similarity, RAG
+Mini Neural netwerk. UIteraard weer DSA toepassen. Evt met SQL naar harde schijf. 
+Matrix multiplication. Back Propagation. Activation. Aantal parameters. loss. Gradient.
+Semantic search. transformar
+embeddings
+vector databases
+semantic search
+RAG
+transformers
+attention
+neural networks
+backpropagation
+model parameters
+fine-tuning
+LoRA/QLoRA
+quantization
+lokale LLM inference
+evaluatie van AI-systemen
