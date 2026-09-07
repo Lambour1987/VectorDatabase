@@ -51,6 +51,16 @@ struct DijkstraResult
     std::vector<GraphNode*>previous;
 };
 
+// 7-9-2026: Struct A-star result: Uitbreiding van Dijkstra om op basis van schattingen (afgeleid van Eucleudische afstand)
+// het SSSP te berekenen ipv alleen de werkelijke afstanden. We berekenen per positie de afstand tot de doelpositie. 
+
+struct AStarResult
+{
+    //HIer dus ipv distances (Dijkstra) gscores gebruiken.
+    std::vector<double>gScores;
+    std::vector<GraphNode*> previous;
+};
+
 class Graph
 {
     public:
@@ -61,6 +71,7 @@ class Graph
         void dfsRecursive(GraphNode* currentNode, std::vector<GraphNode*>&visited);
         //void dijkstra(GraphNode* startNode);
         DijkstraResult dijkstra(GraphNode* startNode);
+        AStarResult aStar(GraphNode* startNode, GraphNode* targetNode);
         std::vector<GraphNode*>reconstructPath(GraphNode* startNode, GraphNode* targetNode, const std::vector<GraphNode*>& previous);
 
         ~Graph();

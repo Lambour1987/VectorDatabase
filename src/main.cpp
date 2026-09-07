@@ -140,16 +140,18 @@ int main()
     // }
 
     //7-9-26: Dijkstra oproepen
-    cout << "\nDijkstra:" << endl;
+    cout << "\nA*:" << endl;
     //graph.dijkstra(A);
 
     DijkstraResult result = graph.dijkstra(A);
 
-    vector<GraphNode*> path = graph.reconstructPath(A,B,result.previous);
+    AStarResult aStarResult = graph.aStar(A,F);
+
+    vector<GraphNode*> aStarPath = graph.reconstructPath(A,B,result.previous);
 
     cout << "\nPath A -> B: ";
 
-    for (GraphNode* node : path)
+    for (GraphNode* node : aStarPath)
     {
         cout << node->getId() << " ";
     }

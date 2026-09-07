@@ -262,6 +262,83 @@ vector<GraphNode*> Graph::reconstructPath(GraphNode* startNode, GraphNode* targe
     return path;
 }
 
+//
+AStarResult Graph::aStar(GraphNode* startNode, GraphNode* targetNode)
+{
+    //Initialisatie met alle waarden op infinity
+    vector<double>gScores(nodes.size(), std::numeric_limits<double>::infinity());
+    vector<GraphNode*> previous(nodes.size(),nullptr);
+
+    //7-9-26:
+    gScores[startNode->getId()] = 0;
+
+    MinHeap heap;
+
+    double g = 0;
+    double h = startNode->vector.distanceTo(targetNode->vector);
+    double f = g +h;
+    heap.push({f, startNode});
+
+    while(!heap.empty())
+    {
+        auto current = heap.top();
+        heap.pop();
+
+        double currentF = current->first;
+        GraphNode* currentNode = current->second;
+
+        double currentG = gScores[currentNode->getId()];
+
+        double currentH = currentNode->vector.distanceTo(targetNode->vector);
+
+        double expectedF = currentG + currentH;
+
+            // 👇 HIER zetten
+        cout << "A* visits node: "
+            << currentNode->getId()
+            << " | g = " << currentG
+            << " | h = " << currentH
+            << " | f = " << currentF
+            << endl;
+
+        if(currentF>expectedF)
+        {
+            continue;
+        }
+
+        if(currentNode == targetNode)
+        {
+            break;
+        }
+
+        //7-9-26: Hier de buren gaan bekijken
+        for(const Edge& edge:currentNode->getEdges())
+        {
+            GraphNode* neighbor = edge.destination;
+
+            double tentativeG = currentG + edge.weight;
+
+            if(tentativeG < gScores[neighbor->getId()])
+            {
+                gScores[neighbor->getId()]=tentativeG;
+                previous[neighbor->getId()] = currentNode;
+
+                double h = neighbor->vector.distanceTo(targetNode->vector);
+
+                double f = tentativeG + h;
+
+                heap.push({f, neighbor});
+            }
+
+        }
+    }
+
+    return {gScores, previous};
+
+}
+
+
+
 //7-9-26: Destructor
 Graph::~Graph()
 {
