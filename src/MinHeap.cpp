@@ -1,14 +1,17 @@
+//3-9-2026: Gekopieerd van MaxHeap en gewijzigd naar MinHeap
+
 //22-8-2026
 // 3-9-2026: bedenk of D-Ary heap iets nuttigs is hier
+// 4-9-2026: Kopie van MaxHeap en aangepast. Commentaar niet gewijzigd.
 
-#include "../include/MaxHeap.h"
+#include "../include/MinHeap.h"
 
 #include <iostream>
 
 using namespace std;
 
 //Functie push van de Class Maxheap die als iput een waarde gebruikt
-void MaxHeap::push(std::pair<double,const Vector*> value)
+void MinHeap::push(std::pair<double, GraphNode*> value)
 {
     //Push waarde op de vector (achteraan)
     values.push_back(value);
@@ -22,7 +25,7 @@ void MaxHeap::push(std::pair<double,const Vector*> value)
             int ParentIndex = (ChildIndex-1)/2;
 
             //Als waarde element op ChildIndex > waarde element ParentIndex, swap
-            if(values[ChildIndex].first>values[ParentIndex].first)
+            if(values[ChildIndex].first<values[ParentIndex].first)
             {
                 //Wissel de waarden
                 std::swap(values[ChildIndex], values[ParentIndex]);
@@ -43,7 +46,7 @@ void MaxHeap::push(std::pair<double,const Vector*> value)
 //Geeft de waarde van het grootste element op index 0 terug
 //Gebruik optional<int> om onderscheid te maken indien een waarde in de heap 0 is en een lege heap.
 //25-8-26: van std::optional<int> MaxHeap::top() const naar
-optional<pair<double, const Vector*>> MaxHeap::top() const
+optional<pair<double, GraphNode*>> MinHeap::top() const
 {
     // De vector values komt uit de class en is een membervariabele (dus niet als parameter meenemen)
     // Als het element op index 0 niet leeg is, 
@@ -58,7 +61,7 @@ optional<pair<double, const Vector*>> MaxHeap::top() const
 }
 
 //DUs poppen van heap. Niet teruggeven
-void MaxHeap::pop()
+void MinHeap::pop()
 {
     if(empty())
     {
@@ -67,7 +70,7 @@ void MaxHeap::pop()
     }
 
     int lastindex = values.size()-1;
-    std::swap(values[0], values[lastindex]);
+    swap(values[0], values[lastindex]);
     values.pop_back();
     
     // Nu van boven naar beneden swappen als beneden>boven. Swap met kind met hoogste waarde
@@ -83,22 +86,22 @@ void MaxHeap::pop()
     
         if(rightChild<values.size())
         {
-            int maxChildIndex;
+            int minChildIndex;
             //Hier kijken of het linkerkind groter is dan het rechterkind of andersom
-            if(values[leftChild].first>values[rightChild].first)
+            if(values[leftChild].first<values[rightChild].first)
             {
-                maxChildIndex = leftChild;
+                minChildIndex = leftChild;
             }
             else
             {
-                maxChildIndex = rightChild;
+                minChildIndex = rightChild;
             }
             //Hier kijken of het grootste kind ook groter is dan element op current index
-            if(values[maxChildIndex].first>values[currentParent].first)
+            if(values[minChildIndex].first<values[currentParent].first)
             {
-                swap(values[currentParent],values[maxChildIndex]);
+                swap(values[currentParent],values[minChildIndex]);
                 //CurrentParent staat op een index
-                currentParent = maxChildIndex;
+                currentParent = minChildIndex;
             }
             else
             {
@@ -108,28 +111,25 @@ void MaxHeap::pop()
         else if(leftChild<values.size())
         {
 
-            //Hier alleen berekenen of currentParent Groter is dan leftChild
-            if(values[leftChild].first>values[currentParent].first)
+            if(values[leftChild].first<values[currentParent].first)
             {
                 swap(values[currentParent],values[leftChild]);
                 currentParent = leftChild;
             }
             else
             {
-                //Als linkerkind niet groter is dan huidig element. Stop dan.
                 break;
             }
         }
         else
         {
-            //Dan geen kinderen, dus ga uit de loop
             break;
         }
     }
 }
 
 //Weer als extra abstractielaag: gebruiker hoeft niet te weten dat wij intern een vector gebruiken.
-bool MaxHeap::empty() const
+bool MinHeap::empty() const
 {
     return values.empty();
 }
@@ -137,7 +137,7 @@ bool MaxHeap::empty() const
 // 25-8-26: Hier een functie size() van mijn eigen Class MaxHeap. Zodat gebruiker niet weet dat
 // wij intern een vector gebruiken.
 // const achter de functie: Functie belooft dat hij het MaxHeap object niet verandert.
-size_t MaxHeap::size() const
+size_t MinHeap::size() const
 {
     return values.size();
 }

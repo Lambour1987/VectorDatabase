@@ -8,7 +8,7 @@
 #include "../include/MaxHeap.h"
 #include "../include/KDTree.h"
 #include "../include/Graph.h"
-
+#include "../include/MinHeap.h"
 
 //Voor throw exception, try en catch()
 #include <stdexcept>
@@ -84,35 +84,101 @@ int main()
     GraphNode* D = graph.addNode(v4);
     GraphNode* E = graph.addNode(v5);
     GraphNode* F = graph.addNode(v6);
-    
-    graph.addEdge(A, B);
-    graph.addEdge(A, C);
-    graph.addEdge(B, D);
-    graph.addEdge(B, E);
-    graph.addEdge(C, F);
+    GraphNode* G = graph.addNode(Vector({19,20,21}));
 
-   for (GraphNode* neighbor : A->getNeighbors())
+    graph.addEdge(A, B, 10.0);
+    graph.addEdge(A, C, 3.5);
+    graph.addEdge(C, B, 2.0);
+    graph.addEdge(B, D, 4.0);
+    graph.addEdge(B, E, 5.0);
+    graph.addEdge(C, F, 1.0);
+
+//    for (const Edge& edge : A->getEdges())
+//     {
+//         GraphNode* neighbor = edge.destination;
+//         cout << "A -> Node " << neighbor->getId()
+//              << " | weight: " << edge.weight << endl;
+//     }
+
+//     for (const Edge& edge : B->getEdges())
+//     {
+//         GraphNode* neighbor = edge.destination;
+//         cout << "B -> Node " << neighbor->getId()
+//              << " | weight: " << edge.weight << endl;
+
+//     }
+
+//     cout << "ID A: " << A->getId() << endl;
+//     cout << "ID B: " << B->getId() << endl;
+//     cout << "ID C: " << C->getId() << endl;
+
+//     //3-9-26: BFS en DFS test
+//     cout << "\nBFS:" << endl;
+//     graph.bfs(A);
+
+//     cout << "\nDFS:" << endl;
+//     graph.dfs(A);
+
+    // MinHeap heap;
+
+    // heap.push({5, nullptr});
+    // heap.push({2, nullptr});
+    // heap.push({8, nullptr});
+    // heap.push({1, nullptr});
+    // heap.push({4, nullptr});
+
+    // while (!heap.empty())
+    // {
+    //     auto value = heap.top();
+
+    //     if (value)
+    //     {
+    //         std::cout << value->first << std::endl;
+    //     }
+
+    //     heap.pop();
+    // }
+
+    //7-9-26: Dijkstra oproepen
+    cout << "\nDijkstra:" << endl;
+    //graph.dijkstra(A);
+
+    DijkstraResult result = graph.dijkstra(A);
+
+    vector<GraphNode*> path = graph.reconstructPath(A,B,result.previous);
+
+    cout << "\nPath A -> B: ";
+
+    for (GraphNode* node : path)
     {
-        cout << "A -> Node " << neighbor->getId() << endl;
+        cout << node->getId() << " ";
     }
 
-    for (GraphNode* neighbor : B->getNeighbors())
+    cout << endl;
+
+    vector<GraphNode*> pathF =
+    graph.reconstructPath(A, F, result.previous);
+
+    cout << "Path A -> F: ";
+
+    for (GraphNode* node : pathF)
     {
-        cout << "B -> Node " << neighbor->getId() << endl;
+        cout << node->getId() << " ";
     }
 
-    cout << "ID A: " << A->getId() << endl;
-    cout << "ID B: " << B->getId() << endl;
-    cout << "ID C: " << C->getId() << endl;
+    cout << endl;
 
-    //3-9-26: BFS en DFS test
-    cout << "\nBFS:" << endl;
-    graph.bfs(A);
+    vector<GraphNode*> pathG =
+    graph.reconstructPath(A, G, result.previous);
 
-    cout << "\nDFS:" << endl;
-    graph.dfs(A);
+    cout << "Path A -> G: ";
 
+    for (GraphNode* node : pathG)
+    {
+        cout << node->getId() << " ";
+    }
 
+    cout << endl;
     return 0;
 }
 
