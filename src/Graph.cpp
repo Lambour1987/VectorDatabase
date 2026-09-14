@@ -119,17 +119,17 @@ void Graph::bfs(GraphNode* startNode)
 
 void Graph::dfs(GraphNode* startNode)
 {
-    //12-9-2026 Naar unordered set vector<GraphNode*>visited;
-    //unordered_set<GraphNode*> visited; 
-    vector<GraphNode*> visited;
+    //14-9-2026 Naar unordered set vector<GraphNode*>visited;
+    //vector<GraphNode*> visited;
+    unordered_set<GraphNode*> visited; 
 
     dfsRecursive(startNode, visited);
 }
 
-void Graph::dfsRecursive(GraphNode* currentNode, vector<GraphNode*>&visited)
+void Graph::dfsRecursive(GraphNode* currentNode, unordered_set<GraphNode*>&visited)
 {
-    //12-9-26: ipv visited.push_back(startNode) wordt dit
-    visited.push_back(currentNode);
+    //1d-9-26: ipv visited.push_back(startNode) wordt dit
+    visited.insert(currentNode);
     
     cout<<"Visited Node: "<<currentNode->getId()<<endl;
 
@@ -137,19 +137,24 @@ void Graph::dfsRecursive(GraphNode* currentNode, vector<GraphNode*>&visited)
     for(const Edge& edge:currentNode->getEdges())
     {
          GraphNode* neighbor = edge.destination;
-         bool alreadyVisited = false;
-         for(GraphNode* visitedNode:visited)
-         {
-             if(visitedNode == neighbor)
-             {
-                 alreadyVisited = true;
-                 break;
-             }
-         }
-         if(!alreadyVisited)
-         {
-             dfsRecursive(neighbor, visited);
-         }
+         //14-9-2026: eruit vanwege unordered mapbool alreadyVisited = false;
+         //for(GraphNode* visitedNode:visited)
+        //  {
+        //      if(visitedNode == neighbor)
+        //      {
+        //          alreadyVisited = true;
+        //          break;
+        //      }
+        //  }
+        //  if(!alreadyVisited)
+        //  {
+        //      dfsRecursive(neighbor, visited);
+        //  }
+        //14-9-2026: nieuw
+        if(visited.find(neighbor) == visited.end())
+        {
+            dfsRecursive(neighbor, visited);
+        }
 
     //12-9-26: omdat we een set gebruiken 
     //if(visited.find(neighbor)==visited.end())

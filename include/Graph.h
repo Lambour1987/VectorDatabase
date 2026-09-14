@@ -9,6 +9,7 @@
 #include <cstddef>
 
 //14-9-26
+#include <unordered_set>
 #include <unordered_map>
 
 //We vertellen alvast dat GraphNode bestaat
@@ -75,7 +76,9 @@ class Graph
         void addEdge(GraphNode* node1, GraphNode* node2, double weight);
         void bfs(GraphNode* startNode);
         void dfs(GraphNode* startNode);
-        void dfsRecursive(GraphNode* currentNode, std::vector<GraphNode*>&visited);
+        //14-9-2026: wordt unordered map void dfsRecursive(GraphNode* currentNode, std::vector<GraphNode*>&visited);
+        void dfsRecursive(GraphNode* currentNode, std::unordered_set<GraphNode*>& visited);
+        
         //void dijkstra(GraphNode* startNode);
         DijkstraResult dijkstra(GraphNode* startNode);
         AStarResult aStar(GraphNode* startNode, GraphNode* targetNode);

@@ -112,12 +112,12 @@ int main()
 //     cout << "ID B: " << B->getId() << endl;
 //     cout << "ID C: " << C->getId() << endl;
 
-//     //3-9-26: BFS en DFS test
-//     cout << "\nBFS:" << endl;
-//     graph.bfs(A);
+     //3-9-26: BFS en DFS test
+     cout << "\nBFS:" << endl;
+     graph.bfs(A);
 
-//     cout << "\nDFS:" << endl;
-//     graph.dfs(A);
+     cout << "\nDFS:" << endl;
+     graph.dfs(A);
 
     // MinHeap heap;
 
