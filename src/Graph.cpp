@@ -8,6 +8,12 @@
 #include <limits>
 #include <algorithm>
 
+//12-9-2026: Unordered set toegevoegd
+#include <unordered_set>
+
+//14-9-2026: Unordered map toegevoegd
+#include <unordered_map>
+
 using namespace std;
 
 //Constructor
@@ -56,10 +62,19 @@ void Graph::bfs(GraphNode* startNode)
     queue<GraphNode*> queue;
 
     //2-9-26: Dit kan later sneller met een set
-    vector<GraphNode*> visited;
+    //12-9-26: set vector<GraphNode*> visited;
+    unordered_set<GraphNode*> visited;
+
+    //14-9-26: als test tbv DFS neergezet
+    unordered_map<GraphNode*, double> distances;
+    distances[startNode]=0.0;
+    cout << "Distance of startNode: "
+     << distances[startNode]
+     << endl;
 
     queue.push(startNode);
-    visited.push_back(startNode);
+    //12-9 vervangen omdat we set gebruiken. visited.push_back(startNode); wordt
+    visited.insert(startNode);
 
     while(!queue.empty())
     {
@@ -69,25 +84,34 @@ void Graph::bfs(GraphNode* startNode)
 
         cout<<"Visited Node: "<<currentNode->getId() <<endl;
 
-        //doorloop de neighbours
+        //doorloop de neighbours:
+        //10-9-26: Dus: currentNode wijst naar een GraphNode object die een memberfunctie getEdges heeft waarvan de output een vector van Edges is.
+        // Door die output lopen we heen (dat zijn dus Edge objecten binnen de vector) en daarvan pakken we steeds eentje eruit (en noemen we edge)
         for(const Edge& edge : currentNode->getEdges())
         {
             GraphNode* neighbor = edge.destination;
 
             bool alreadyVisited = false;
             
-            for( GraphNode*visitedNode:visited)
-            {
-                if(visitedNode == neighbor)
-                {      
-                    alreadyVisited = true;
-                    break;
-                }
-            }
-            if(!alreadyVisited)
+            // 12-9-26: 
+            // for( GraphNode*visitedNode:visited)
+            // {
+            //     if(visitedNode == neighbor)
+            //     {      
+            //         alreadyVisited = true;
+            //         break;
+            //     }
+            // }
+            // if(!alreadyVisited)
+            // {
+            //     queue.push(neighbor);
+            //     visited.push_back(neighbor);
+            // }
+
+            if(visited.find(neighbor)== visited.end())
             {
                 queue.push(neighbor);
-                visited.push_back(neighbor);
+                visited.insert(neighbor);
             }
         }
     }
@@ -95,36 +119,44 @@ void Graph::bfs(GraphNode* startNode)
 
 void Graph::dfs(GraphNode* startNode)
 {
-    vector<GraphNode*>visited;
+    //12-9-2026 Naar unordered set vector<GraphNode*>visited;
+    //unordered_set<GraphNode*> visited; 
+    vector<GraphNode*> visited;
 
     dfsRecursive(startNode, visited);
 }
 
 void Graph::dfsRecursive(GraphNode* currentNode, vector<GraphNode*>&visited)
 {
+    //12-9-26: ipv visited.push_back(startNode) wordt dit
     visited.push_back(currentNode);
     
     cout<<"Visited Node: "<<currentNode->getId()<<endl;
 
+    //12-9-26: Dit hele stuk (geneste forloop en if statement wordt vervangen door 1 if statement)
     for(const Edge& edge:currentNode->getEdges())
     {
-        GraphNode* neighbor = edge.destination;
+         GraphNode* neighbor = edge.destination;
+         bool alreadyVisited = false;
+         for(GraphNode* visitedNode:visited)
+         {
+             if(visitedNode == neighbor)
+             {
+                 alreadyVisited = true;
+                 break;
+             }
+         }
+         if(!alreadyVisited)
+         {
+             dfsRecursive(neighbor, visited);
+         }
 
-        bool alreadyVisited = false;
+    //12-9-26: omdat we een set gebruiken 
+    //if(visited.find(neighbor)==visited.end())
+    //{
+    //   queue.push(neighbor);
+    //  visited.insert(neighbor);
 
-        for(GraphNode* visitedNode:visited)
-        {
-            if(visitedNode == neighbor)
-            {
-                alreadyVisited = true;
-                break;
-            }
-        }
-
-        if(!alreadyVisited)
-        {
-            dfsRecursive(neighbor, visited);
-        }
     }
 }
 
@@ -133,13 +165,27 @@ DijkstraResult Graph::dijkstra(GraphNode* startNode)
 {
     //3-9-26: Initialiseer een vector distances die de omvang heeft van het aantal nodes en en geef de waarden infinity
     // Dus initialiseer alles op infinity
-    std::vector<double> distances(nodes.size(), std::numeric_limits<double>::infinity());
+    //14-9-2026: Dit gewijzigd naar een unordered_map: std::vector<double> distances(nodes.size(), std::numeric_limits<double>::infinity());
+    unordered_map<GraphNode*, double> distances;
+
+    //14-9-26: Schijnbaar dit er bij zetten
+    for(GraphNode* node : nodes)
+    {
+        distances[node] = std::numeric_limits<double>::infinity();
+    }
+
+
 
     //7-9-26: Declareer en initaliseer previous
-    std::vector<GraphNode*> previous(nodes.size(), nullptr);
+    // std::vector<GraphNode*> previous(nodes.size(), nullptr);
+    //14-9-26: w
+    distances[startNode] = 0.0;
 
     //Hier zetten we de eerste node op 0 (want vanuit daar berekenen)
-    distances[startNode->getId()] = 0;
+    // wordt anders distances[startNode->getId()] = 0;
+    //14-9-26: moet weg en wordt distances[currentNode];
+    // vector<GraphNode*> previous(nodes.size(), nullptr);
+    unordered_map<GraphNode*, GraphNode*>previous;
 
     //Om de laagste waarde te bepalen gebruiken we een MinHeap
     MinHeap heap;
@@ -163,7 +209,8 @@ DijkstraResult Graph::dijkstra(GraphNode* startNode)
 
         // Als de afstand die uit deze node uit de heap komt slechter is dan de afstand die we al kennen, dan slaan
         // we die over
-        if (currentDistance > distances[currentNode->getId()])
+        //14-9-26: Wijzigt ook van if (currentDistance > distances[currentNode->getId()])
+        if(currentDistance>distances[currentNode])
         {
             continue;
         }
@@ -182,13 +229,16 @@ DijkstraResult Graph::dijkstra(GraphNode* startNode)
             // de huidige distance naar de andere edges
             double newDistance = currentDistance + edge.weight;
             //Als de nieuwe afstand kleiner is dan de afstand die er al staat
-            if(newDistance<distances[edge.destination->getId()])
+            // if(newDistance<distances[edge.destination->getId()])
+            if(newDistance<distances[edge.destination])
             {
                 //Neem dan de nieuwe afstand
-                distances[edge.destination->getId()]=newDistance;
+                // distances[edge.destination->getId()] = newDistance;
+                distances[edge.destination] = newDistance;
 
                 //7-9-26 Van welke node kwamen wij toen we de beste route vonden naar huidige node
-                previous[edge.destination->getId()] = currentNode;
+                //14-9-26 previous[edge.destination->getId()] = currentNode; wordt
+                previous[edge.destination]=currentNode;
 
                 // Direct tijdens het doorlopen stoppen we de node in de heap. Dit doen we tijdens het doorlopen
                 // direct. Als we het buiten de loop in de heap zouden stoppen dan heeft het geen zin omdat we dan
@@ -229,7 +279,8 @@ DijkstraResult Graph::dijkstra(GraphNode* startNode)
 
 //7-9-2026: Pad Reconstruction: Functie reconstructPath die als input een pointer StartNode en een TargetNode heeft
 // en de vector van pointers previous
-vector<GraphNode*> Graph::reconstructPath(GraphNode* startNode, GraphNode* targetNode, const vector<GraphNode*>& previous)
+//14-9-26: Dit wordt dus een unordered map vector<GraphNode*> Graph::reconstructPath(GraphNode* startNode, GraphNode* targetNode, const vector<GraphNode*>& previous)
+vector<GraphNode*> Graph::reconstructPath(GraphNode* startNode, GraphNode* targetNode, const unordered_map<GraphNode*,GraphNode*>& previous)
 {
     //Maak leeg path
     vector<GraphNode*> path;
@@ -246,7 +297,18 @@ vector<GraphNode*> Graph::reconstructPath(GraphNode* startNode, GraphNode* targe
             break;
         }
 
-        currentNode = previous[currentNode->getId()];
+        //14-9-26: Gewijzigd: currentNode = previous[currentNode->getId()];
+        // Gebruik at currentNode = previous.at(currentNode);
+
+        auto it = previous.find(currentNode);
+
+        if(it==previous.end())
+        {
+            path.clear();
+            return path;
+        }
+        currentNode = it->second;
+
     }
 
     //Target was niet bereikbaar vanaf start
@@ -293,7 +355,7 @@ AStarResult Graph::aStar(GraphNode* startNode, GraphNode* targetNode)
 
         double expectedF = currentG + currentH;
 
-            // 👇 HIER zetten
+
         cout << "A* visits node: "
             << currentNode->getId()
             << " | g = " << currentG
@@ -336,6 +398,7 @@ AStarResult Graph::aStar(GraphNode* startNode, GraphNode* targetNode)
     return {gScores, previous};
 
 }
+
 
 
 

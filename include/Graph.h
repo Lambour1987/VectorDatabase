@@ -8,6 +8,9 @@
 //7-9-26:
 #include <cstddef>
 
+//14-9-26
+#include <unordered_map>
+
 //We vertellen alvast dat GraphNode bestaat
 class GraphNode;
 
@@ -47,9 +50,13 @@ class GraphNode
 
 struct DijkstraResult
 {
-    std::vector<double>distances;
-    std::vector<GraphNode*>previous;
-};
+    //14-9-2026: dit wordne unordered maps
+    // std::vector<double>distances;
+    // std::vector<GraphNode*>previous;
+    std::unordered_map<GraphNode*, double> distances;
+    std::unordered_map<GraphNode*,GraphNode*> previous;
+};    
+
 
 // 7-9-2026: Struct A-star result: Uitbreiding van Dijkstra om op basis van schattingen (afgeleid van Eucleudische afstand)
 // het SSSP te berekenen ipv alleen de werkelijke afstanden. We berekenen per positie de afstand tot de doelpositie. 
@@ -72,7 +79,8 @@ class Graph
         //void dijkstra(GraphNode* startNode);
         DijkstraResult dijkstra(GraphNode* startNode);
         AStarResult aStar(GraphNode* startNode, GraphNode* targetNode);
-        std::vector<GraphNode*>reconstructPath(GraphNode* startNode, GraphNode* targetNode, const std::vector<GraphNode*>& previous);
+        //14-9-26: Deze ook aangepast naar een unordered_map: std::vector<GraphNode*>reconstructPath(GraphNode* startNode, GraphNode* targetNode, const std::vector<GraphNode*>& previous);
+        std::vector<GraphNode*> reconstructPath(GraphNode* startNode,GraphNode* targetNode,const std::unordered_map<GraphNode*, GraphNode*>& previous);
 
         ~Graph();
 

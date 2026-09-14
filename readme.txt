@@ -94,3 +94,4 @@ LoRA/QLoRA
 quantization
 lokale LLM inference
 evaluatie van AI-systemen
+harnessing
