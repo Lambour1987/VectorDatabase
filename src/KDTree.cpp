@@ -1,12 +1,14 @@
 //25-8-2026
 
 #include "../include/KDTree.h"
+#include "../include/MaxHeap.h"
 #include <algorithm>
 #include <iostream>
 //inlcude math voor de abs functie
 #include <cmath>
 
 using namespace std;
+
 
 //Constructor
 KDTree::KDTree(const vector<Vector>&vectors):root(nullptr)
@@ -22,6 +24,9 @@ KDTree::KDTree(const vector<Vector>&vectors):root(nullptr)
     }
     root = buildKDTree(points, 0);
 }
+
+
+
 
 //28-8-2026: KDTree basecase
 // BELANGRIJK: als ik deze in draw.io uit ga tekenen moet het duidelijk worden dat we DFS de punten (A*,B*,C*) vinden
@@ -119,6 +124,7 @@ void KDTree::destroyTree(KDNode* node)
     delete node;
 }
 
+//15-9-2026: Let op dit is nearestNeighbor (enkelvoud. Bovenin Neighbors)
 KDNode* KDTree::nearestNeighbor(KDNode* node, const Vector& query, KDNode* best)
 {
 
@@ -172,3 +178,82 @@ KDNode* KDTree::nearestNeighbor(KDNode* node, const Vector& query, KDNode* best)
     return best;
 
 }
+
+//15-9-2026: kNearestNeighbors (dus meervoud). m.b.v heap: eerste deel hetzelfde als 
+// bij kNearestNeighbor
+void KDTree::kNearestNeighbors(KDNode* node, const Vector& query, std::size_t k, MaxHeap& heap) const
+{
+    KDNode* first;
+    KDNode* second;
+
+    if(node == nullptr)
+    {
+        return;
+    }
+
+    if(query.at(node->dimension) < node->vector->at(node->dimension))
+    {
+        first = node->left;
+        second = node->right;
+    }
+    else
+    {
+        first = node->right;
+        second = node->left;
+    }
+
+    kNearestNeighbors(first, query, k, heap);
+
+    double distance = query.distanceTo(*node->vector);
+
+    if(heap.size() < k)
+    {
+        heap.push({distance, node->vector});
+    }
+    else
+    {
+        auto top = heap.top();
+        double worstDistance = top->first;
+
+        if(distance < worstDistance)
+        {
+            heap.pop();
+            heap.push({distance, node->vector});
+        }
+    }
+
+    double planeDistance =
+    std::abs(query.at(node->dimension)- node->vector->at(node->dimension));
+
+    if(heap.size() < k || planeDistance < heap.top()->first)
+    {
+        kNearestNeighbors(second, query, k, heap);
+    }
+    
+}
+
+std::vector<const Vector*> KDTree::kNearestNeighbors(const Vector& query,std::size_t k) const
+{
+    MaxHeap heap;
+
+    kNearestNeighbors(root, query, k, heap);
+
+    std::vector<const Vector*> neighbors;
+
+    while(!heap.empty())
+    {
+        auto top = heap.top();
+
+        neighbors.push_back(top->second);
+
+        heap.pop();
+    }
+
+    std::reverse(neighbors.begin(), neighbors.end());
+
+    return neighbors;
+
+
+}
+
+

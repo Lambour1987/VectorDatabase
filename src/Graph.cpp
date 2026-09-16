@@ -2,6 +2,7 @@
 
 #include "..\include\Graph.h"
 #include "..\include\MinHeap.h"
+#include "..\include\KDTree.h"
 
 #include <queue>
 #include <iostream>
@@ -404,6 +405,67 @@ AStarResult Graph::aStar(GraphNode* startNode, GraphNode* targetNode)
 
 }
 
+//15-9-2026: maake een functie connectKNearestNeighbors en geef als input een referentie genaamd tree naar de
+// KD tree, die we niet mogen aanpassen en een variabele k van size_t
+void Graph::connectKNearestNeighbors(const KDTree& tree, std::size_t k)
+{
+    //Doorloop de graphnodes met een pointer genaamd node
+    for(GraphNode* node:nodes)
+    // Zoek de k dichtstbijzijnde neighbors van de vector van node
+    // via de KD-tree en sla deze op in een vector van const Vector-pointers
+    // genaamd neighbors.
+    {
+        //16-9-2026: kleine wijziging: k+1 ipv vector<const Vector*> neighbors = tree.kNearestNeighbors(node->vector,k);
+        vector<const Vector*> neighbors = tree.kNearestNeighbors(node->vector,k+1);
+        // Doorloop alle gevonden neighbors met een pointer
+        // genaamd neighbor naar een const Vector.
+        for(const Vector* neighbor:neighbors)
+        {
+            // Doorloop alle GraphNodes met een pointer
+            // genaamd neighborNode naar een GraphNode.
+            for(GraphNode* neighborNode:nodes)
+            {
+            // Controleer of het adres van de Vector in neighborNode
+            // hetzelfde is als de Vector-pointer neighbor.
+                //16-9-2026: Vervang dit if(&neighborNode->vector==neighbor) door
+                if(neighborNode->vector == *neighbor)
+                // Bereken de afstand tussen node->vector en neighbor.
+                {
+                    if(neighborNode->vector == node->vector)
+                    {
+                        continue;
+                    }
+                    double distance = node->vector.distanceTo(*neighbor);
+                    // Voeg een edge toe van node naar neighborNode
+                    // met distance als gewicht.
+                    addEdge(node,neighborNode,distance);
+
+                    //Stop met het zoeken naar deze neighbor
+                    break;
+                }
+            }
+        }
+    }
+}
+
+//16-9-2026: print nearestNeighbor
+void Graph::printEdges() const
+{
+    cout << "\nKNN Graph edges:\n";
+
+    for(const GraphNode* node : nodes)
+    {
+        for(const Edge& edge : node->getEdges())
+        {
+            cout << node->getId()
+                 << " -> "
+                 << edge.destination->getId()
+                 << " | distance = "
+                 << edge.weight
+                 << endl;
+        }
+    }
+}
 
 
 

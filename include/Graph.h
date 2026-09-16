@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Vector.h"
+#include "KDTree.h"
 #include <vector>
 
 //7-9-26:
@@ -85,6 +86,12 @@ class Graph
         //14-9-26: Deze ook aangepast naar een unordered_map: std::vector<GraphNode*>reconstructPath(GraphNode* startNode, GraphNode* targetNode, const std::vector<GraphNode*>& previous);
         std::vector<GraphNode*> reconstructPath(GraphNode* startNode,GraphNode* targetNode,const std::unordered_map<GraphNode*, GraphNode*>& previous);
 
+        //15-9-2026 
+        void connectKNearestNeighbors(const KDTree& tree, std::size_t k);
+
+        //16-9-2026: printfunctie voor connectNearestNeighbors
+        void printEdges() const;
+        
         ~Graph();
 
     private:

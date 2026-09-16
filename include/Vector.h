@@ -32,6 +32,9 @@ class Vector
         //&other is een referentie naar een andere vector
         double distanceTo(const Vector& other) const;
 
+        //16-9-2026: Nieuw anders werkt iets niet
+        bool operator==(const Vector& other)const;
+
         //BELANGRIJK:
         //static: er bestaat 1 MAX_DIMENSIONS voor de hele class Vector (niet 1 waarde voor ieder vector object)
         // (VS Global variabele: die staat buiten een class)

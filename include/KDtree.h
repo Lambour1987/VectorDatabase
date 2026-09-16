@@ -3,6 +3,8 @@
 #pragma once
 
 #include "Vector.h"
+#include "MaxHeap.h"
+
 //geeft standaard C++ types zoals std::size_t
 #include <cstddef>
 #include <vector>
@@ -36,10 +38,16 @@ class KDTree
         //28-8-26: Zoekfunctie voor de KDTree: Roep de functie nearestNeighbor op die een pointer heeft naar een KDnode genaamdnode, referentie naar een vector genaamd query
         // en een pointer genaamd best naar een KDNode object.
         KDNode* nearestNeighbor(KDNode* node, const Vector& query, KDNode* best);
+        //15-9-2026 Helper functie 
+        void kNearestNeighbors(KDNode* node, const Vector& query, std::size_t k, MaxHeap& heap) const;
         
 
     public:
         KDTree(const std::vector<Vector>& vectors);
+        //15-9-2026: Toegevoegd t.b.v. NearestNeighbors uit Heap zoeken: let op: dezelfde naam als
+        // die in de private functie: dit is overloading.
+        std::vector<const Vector*> kNearestNeighbors(const Vector& query, std::size_t k) const;
+       
         ~KDTree();
 
         //TestFunctie om te kijken of de KDTree werkt

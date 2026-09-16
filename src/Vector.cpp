@@ -77,3 +77,8 @@ double Vector::distanceTo(const Vector& other) const
     // Van de totale som doen we de wortel en dat is het antwoord.
     return sqrt(sum);
 }
+
+bool Vector::operator==(const Vector& other) const
+{
+    return values == other.values;
+}

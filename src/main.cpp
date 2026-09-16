@@ -10,10 +10,12 @@
 #include "../include/Graph.h"
 #include "../include/MinHeap.h"
 
+
 //Voor throw exception, try en catch()
 #include <stdexcept>
 #include <iostream>
 #include <string>
+#include <unordered_map>
 
 //Hiermee kunnen we informatie opvragen over een datatype. Bijv. wat is de grootste integer.
 #include <limits>
@@ -85,6 +87,18 @@ int main()
     GraphNode* E = graph.addNode(v5);
     GraphNode* F = graph.addNode(v6);
     GraphNode* G = graph.addNode(Vector({19,20,21}));
+
+    //14-9-2026: Toegevoegd:
+
+    unordered_map<GraphNode*, double> scores;
+    scores[A]=10.5;
+    scores[B]=20.0;
+    scores[C]=7.5;
+
+    cout << "\nScores:" << endl;
+    cout << "A: " << scores[A] << endl;
+    cout << "B: " << scores[B] << endl;
+    cout << "C: " << scores[C] << endl;
 
     graph.addEdge(A, B, 10.0);
     graph.addEdge(A, C, 3.5);
@@ -181,6 +195,55 @@ int main()
     }
 
     cout << endl;
+
+    cout << "\nKNN:\n";
+
+    vector<Vector> vectors = 
+    {
+        v1,
+        v2,
+        v3,
+        v4,
+        v5,
+        v6
+    };
+
+    Vector query({4.0, 5.0, 6.0});
+
+    KDTree kdTree(vectors);
+
+    //16-9-2026 Aanroep connectNearestNeighbors
+    graph.connectKNearestNeighbors(kdTree, 2);
+
+    //16-9-2026: en print Neighbors
+    graph.printEdges();
+
+    vector<const Vector*> neighbors =
+        kdTree.kNearestNeighbors(query, 3);
+
+    for(size_t i = 0; i < neighbors.size(); ++i)
+    {
+        cout << "Neighbor " << i + 1 << ": "
+            << neighbors[i]->at(0) << ", "
+            << neighbors[i]->at(1) << ", "
+            << neighbors[i]->at(2)
+            << endl;
+    }
+
+    //16-9-2026: Nog een graph om te testen
+    Graph knnGraph;
+
+    for(const Vector& vector : vectors)
+    {
+        knnGraph.addNode(vector);
+    }
+
+    knnGraph.connectKNearestNeighbors(kdTree, 2);
+
+    knnGraph.printEdges();
+
+
+
     return 0;
 }
 
