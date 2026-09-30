@@ -1,4 +1,5 @@
 //20-8-26
+//22-9-26: Dus wordt niet op een object uitgevoerd
 
 #pragma once
 

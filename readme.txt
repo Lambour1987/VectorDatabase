@@ -54,6 +54,9 @@ Wanneer de basis werkt, kunnen we uitbreiden met:
 * semantic search
 * API/networking
 * webinterface
+* 30-9-26: Wel belangrijk. Afwegingen
+: Die Cosine Search moet waarschijnljik komen in plaats van Euclidische afstand
+Ook HNSW search voor nearest neighbor
 
 ## Groter software-ecosysteem
 

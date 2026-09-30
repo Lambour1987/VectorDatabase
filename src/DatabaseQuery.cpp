@@ -36,10 +36,10 @@ void voerQueryUit(const VectorDatabase& database)
         //Loop door de dimensies heen van de vector die het dichtst bij staat.
         //19-8-26: ook aangepast: for(size_t i=0;i<nearest.dimension();i++)
         //20-8-26: aangepast naar pointers van for(size_t i =0; i<result.vector.dimension();i++) naar
-        for(size_t i =0; i<result.vector->dimension();i++)
+        for(size_t i =0; i<result.item->vector.dimension();i++)
         {
             //Print de waarden van deze vector
-            cout<<result.vector->at(i)<<endl;
+            cout<<result.item->vector.at(i)<<endl;
         }
 
         //20-8-2026
@@ -68,10 +68,10 @@ void voerQueryUit(const VectorDatabase& database)
             //Bericht: "Afstand" en geef de afstand door de memberfunctie distance op de result op te roepen
             cout<<"Afstand: "<<result.distance<<endl;
             //Loop door alle dimensies van de Vector die in result.vector zit.
-            for(size_t i =0; i<result.vector->dimension();i++)
+            for(size_t i =0; i<result.item->vector.dimension();i++)
             {
                 //Bericht: geef het resultaat van de vector op index i
-                cout<< result.vector->at(i)<<" ";
+                cout<< result.item->vector.at(i)<<" ";
             }
             cout<<endl;
         }

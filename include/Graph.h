@@ -40,6 +40,7 @@ class GraphNode
 
         std::size_t getId() const;
 
+        //Iedere GraphNode heeft dus 1 vector
         Vector vector;
 
     private:
@@ -91,7 +92,7 @@ class Graph
 
         //16-9-2026: printfunctie voor connectNearestNeighbors
         void printEdges() const;
-        
+
         ~Graph();
 
     private:

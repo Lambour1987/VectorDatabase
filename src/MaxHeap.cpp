@@ -8,7 +8,7 @@
 using namespace std;
 
 //Functie push van de Class Maxheap die als iput een waarde gebruikt
-void MaxHeap::push(std::pair<double,const Vector*> value)
+void MaxHeap::push(std::pair<double,const KnowledgeItem*> value)
 {
     //Push waarde op de vector (achteraan)
     values.push_back(value);
@@ -43,7 +43,7 @@ void MaxHeap::push(std::pair<double,const Vector*> value)
 //Geeft de waarde van het grootste element op index 0 terug
 //Gebruik optional<int> om onderscheid te maken indien een waarde in de heap 0 is en een lege heap.
 //25-8-26: van std::optional<int> MaxHeap::top() const naar
-optional<pair<double, const Vector*>> MaxHeap::top() const
+optional<pair<double, const KnowledgeItem*>> MaxHeap::top() const
 {
     // De vector values komt uit de class en is een membervariabele (dus niet als parameter meenemen)
     // Als het element op index 0 niet leeg is, 

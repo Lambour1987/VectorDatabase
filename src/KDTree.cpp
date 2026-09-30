@@ -2,115 +2,150 @@
 
 #include "../include/KDTree.h"
 #include "../include/MaxHeap.h"
+
 #include <algorithm>
 #include <iostream>
-//inlcude math voor de abs functie
 #include <cmath>
 
 using namespace std;
 
 
-//Constructor
-KDTree::KDTree(const vector<Vector>&vectors):root(nullptr)
+// Constructor
+// De KDTree krijgt nu een vector met KnowledgeItems.
+// Ieder KnowledgeItem bevat zelf een Vector in .vector.
+KDTree::KDTree(const vector<KnowledgeItem>& items)
+    : root(nullptr)
 {
-    // Constructor loopt door de vector die als parameter heen die aan de constructor is meegegeven
-    //Maak een vector van pointers naar de bestaande Vector objecten
-    vector<const Vector*> points;
+    // Hier bewaren we pointers naar de KnowledgeItems.
+    vector<const KnowledgeItem*> points;
 
-    //Loop door alle vectoren van vectors heen en sla hun adressen op
-    for(const Vector& vector: vectors)
+    for(const KnowledgeItem& item : items)
     {
-        points.push_back(&vector);
+        points.push_back(&item);
     }
+
+    // Start de recursieve opbouw bij dimensie 0.
     root = buildKDTree(points, 0);
 }
 
 
-
-
-//28-8-2026: KDTree basecase
-// BELANGRIJK: als ik deze in draw.io uit ga tekenen moet het duidelijk worden dat we DFS de punten (A*,B*,C*) vinden
-// maar dat we pas bij het afbouwen van de callstack echt de verbindingen gaan maken
-// Functie buildKDTree uit de class KDTree die een pointer naar een KNode teruggeeft en als input gebruikt een vector van 
-// pointers naar Vectoren genaamd points en een size_t dimension.
-KDNode*KDTree::buildKDTree(vector<const Vector*> points, size_t dimension)
+// 28-8-2026: KDTree basecase
+KDNode* KDTree::buildKDTree(
+    vector<const KnowledgeItem*> points,
+    size_t dimension)
 {
-    //Als er geen points meer zijn dan retourneer nullptr
+    // Base case:
+    // Als er geen punten meer zijn, hoeft er geen node gemaakt te worden.
     if(points.empty())
     {
         return nullptr;
     }
 
-    // Sorteer de pointers in points op basis van de waarden waarnaar ze wijzen (op dimension).
-    // a en b zijn de twee pointers die std::sort op dat moment met elkaar vergelijkt.
-    sort(points.begin(), points.end(),[dimension](const Vector* a, const Vector* b)
-    {
-        return a->at(dimension)<b->at(dimension);
-    });
+    // Sorteer de KnowledgeItems op de huidige dimensie.
+    //
+    // Belangrijk:
+    // a en b zijn pointers naar KnowledgeItems.
+    // De Vector die we willen vergelijken zit in:
+    //
+    // a->vector
+    //
+    // Daarom gebruiken we:
+    //
+    // a->vector.at(dimension)
+    sort(
+        points.begin(),
+        points.end(),
+        [dimension](const KnowledgeItem* a, const KnowledgeItem* b)
+        {
+            return a->vector.at(dimension)
+                 < b->vector.at(dimension);
+        }
+    );
 
-    // Bereken mediaan van de gesorteerde vector. Gebruik integerdivision om naar beneden af te ronden
-    size_t middle = points.size()/2;
-    
-    // Maak een nieuwe KDNode aan en sla het adres daarvan op in de pointer node. Geef aan de nieuwe
-    // node mee: de pointer naar de middelste Vector, nullptr voor het linker en rechterkind en de huidige dimensie
-    KDNode* node = new KDNode{points[middle], nullptr, nullptr, dimension};
+    // Pak het middelste element.
+    size_t middle = points.size() / 2;
 
-    //Linker subset: functie leftPoints die teruggeeft een lijst met pointers naar vectoren en sorteert van
-    //het begin tot het midden
-    vector<const Vector*>leftPoints(points.begin(), points.begin()+middle);
+    // De KDNode bewaart nu een pointer naar het hele KnowledgeItem.
+    KDNode* node = new KDNode{
+        points[middle],
+        nullptr,
+        nullptr,
+        dimension
+    };
 
+    // Alles links van middle gaat naar de linker subtree.
+    vector<const KnowledgeItem*> leftPoints(
+        points.begin(),
+        points.begin() + middle
+    );
 
-    //Rechter subset: functie rightPoints die teruggeeft een lijst met pointers naar vectoren en sorteert van
-    //het midden + 1 tot en met het eind.
-    vector<const Vector*>rightPoints(points.begin()+middle+1, points.end());
+    // Alles rechts van middle gaat naar de rechter subtree.
+    vector<const KnowledgeItem*> rightPoints(
+        points.begin() + middle + 1,
+        points.end()
+    );
 
-    //Bepaal de volgende dimensie voor de volgende laag van de boom.
-    size_t nextDimension = (dimension + 1) % Vector::MAX_DIMENSIONS;
+    // Ga naar de volgende dimensie.
+    size_t nextDimension =
+        (dimension + 1) % Vector::MAX_DIMENSIONS;
 
-    //Bouw recursief de linker subtree (dus denk hier aan de call stack: pas daar de connectie maken)
+    // Recursief linker- en rechterdeel bouwen.
     node->left = buildKDTree(leftPoints, nextDimension);
-
-    // Bouw recursief de rechter subtree.
     node->right = buildKDTree(rightPoints, nextDimension);
 
     return node;
 }
 
+
+// Print de hele boom.
 void KDTree::printTree() const
 {
-    printTree(root,0);
+    printTree(root, 0);
 }
 
-//Helperfunctie
-void KDTree::printTree(const KDNode* node, int depth) const
+
+// Recursieve print helper.
+void KDTree::printTree(
+    const KDNode* node,
+    int depth) const
 {
-    if(node==nullptr)
+    if(node == nullptr)
     {
         return;
     }
 
-    for(int i=0; i<depth;++i)
+    for(int i = 0; i < depth; ++i)
     {
         cout << "   ";
     }
 
-    cout<<"["
-        << node->vector->at(0)<< ", "
-        << node->vector->at(1)<<", "
-        << node->vector->at(2)<<"]"
-        << " [dim "
-        << node->dimension
-        << "]\n";
+    // node->item is een KnowledgeItem*.
+    //
+    // De Vector zit vervolgens in:
+    //
+    // node->item->vector
+    //
+    cout << "["
+         << node->item->vector.at(0) << ", "
+         << node->item->vector.at(1) << ", "
+         << node->item->vector.at(2) << "]"
+         << " [dim "
+         << node->dimension
+         << "]\n";
 
-    printTree(node->left, depth+1);
-    printTree(node->right, depth+1);
+    printTree(node->left, depth + 1);
+    printTree(node->right, depth + 1);
 }
 
+
+// Destructor.
 KDTree::~KDTree()
 {
     destroyTree(root);
 }
 
+
+// Recursief alle KDNodes verwijderen.
 void KDTree::destroyTree(KDNode* node)
 {
     if(node == nullptr)
@@ -124,74 +159,31 @@ void KDTree::destroyTree(KDNode* node)
     delete node;
 }
 
-//15-9-2026: Let op dit is nearestNeighbor (enkelvoud. Bovenin Neighbors)
-KDNode* KDTree::nearestNeighbor(KDNode* node, const Vector& query, KDNode* best)
+
+// 15-9-2026: nearestNeighbor
+//
+// query is nog steeds gewoon een Vector.
+//
+// De KDTree zelf bevat KnowledgeItems.
+KDNode* KDTree::nearestNeighbor(
+    KDNode* node,
+    const Vector& query,
+    KDNode* best)
 {
-
-    // pointer first naar KDNode
     KDNode* first;
-
-    // pointer second naar KDNOde
     KDNode* second;
 
-    //Basecase: als we beneden aankomen, retourneer pointer
     if(node == nullptr)
     {
         return best;
     }
-    //Als de query op dimensie x groter dan vector op die dimensie, dan naar rechts.
-    if(query.at(node->dimension)<node->vector->at(node->dimension))
-        // Maar omdat we later eventueel nog naar links kunnen gaan 
-        {
-            first = node->left;
-            second = node->right;
-        }
-    else
-        // Anders   
-        {
-            first = node->right;
-            second = node->left;
-        }
 
-    //1-9-2: Onderzoek de kant die het dichts bij de query ligt
-    best =  nearestNeighbor(first, query, best);
-    
-    //Maak een variabele distance aan van het type double. 
-    // Dit is de afstand van de query naar de huidige node
-    double distance = query.distanceTo(*node->vector);
-
-    // Is de huidige node beter dan best?
-    if(best == nullptr || distance < query.distanceTo(*best->vector))
-    {
-        best = node;
-    }
-
-    // Afstand van query tot het splitsingsvlak
-    double planeDistance = std::abs(query.at(node->dimension)-node->vector->at(node->dimension));
-
-    // Alleen de andere kant onderzoeken als daar mogelijk een betere vector kan zitten
-    if(best == nullptr || planeDistance<query.distanceTo(*best->vector))
-    {
-        best = nearestNeighbor(second,query,best);
-    }
-
-    return best;
-
-}
-
-//15-9-2026: kNearestNeighbors (dus meervoud). m.b.v heap: eerste deel hetzelfde als 
-// bij kNearestNeighbor
-void KDTree::kNearestNeighbors(KDNode* node, const Vector& query, std::size_t k, MaxHeap& heap) const
-{
-    KDNode* first;
-    KDNode* second;
-
-    if(node == nullptr)
-    {
-        return;
-    }
-
-    if(query.at(node->dimension) < node->vector->at(node->dimension))
+    // Kijk naar de Vector die in het KnowledgeItem zit.
+    if(
+        query.at(node->dimension)
+        <
+        node->item->vector.at(node->dimension)
+    )
     {
         first = node->left;
         second = node->right;
@@ -202,43 +194,153 @@ void KDTree::kNearestNeighbors(KDNode* node, const Vector& query, std::size_t k,
         second = node->left;
     }
 
-    kNearestNeighbors(first, query, k, heap);
+    // Eerst zoeken in de kant waar de query volgens de
+    // huidige dimensie waarschijnlijk thuishoort.
+    best = nearestNeighbor(first, query, best);
 
-    double distance = query.distanceTo(*node->vector);
+    // Bereken afstand tussen query en het huidige KnowledgeItem.
+    double distance =
+        query.distanceTo(node->item->vector);
 
-    if(heap.size() < k)
+    // Als dit punt dichterbij is dan onze huidige beste,
+    // wordt dit de nieuwe beste node.
+    if(
+        best == nullptr
+        ||
+        distance < query.distanceTo(best->item->vector)
+    )
     {
-        heap.push({distance, node->vector});
+        best = node;
+    }
+
+    // Afstand van de query tot het scheidingsvlak.
+    double planeDistance =
+        std::abs(
+            query.at(node->dimension)
+            -
+            node->item->vector.at(node->dimension)
+        );
+
+    // Alleen de andere kant bekijken als die mogelijk
+    // een dichter punt kan bevatten.
+    if(
+        best == nullptr
+        ||
+        planeDistance < query.distanceTo(best->item->vector)
+    )
+    {
+        best = nearestNeighbor(second, query, best);
+    }
+
+    return best;
+}
+
+
+// 15-9-2026: kNearestNeighbors helper
+void KDTree::kNearestNeighbors(
+    KDNode* node,
+    const Vector& query,
+    size_t k,
+    MaxHeap& heap) const
+{
+    KDNode* first;
+    KDNode* second;
+
+    if(node == nullptr)
+    {
+        return;
+    }
+
+    // Bepaal eerst welke kant we moeten bezoeken.
+    if(
+        query.at(node->dimension)
+        <
+        node->item->vector.at(node->dimension)
+    )
+    {
+        first = node->left;
+        second = node->right;
     }
     else
     {
+        first = node->right;
+        second = node->left;
+    }
+
+    // Eerst de waarschijnlijk interessante kant bezoeken.
+    kNearestNeighbors(first, query, k, heap);
+
+    // Afstand tussen query en huidig KnowledgeItem.
+    double distance =
+        query.distanceTo(node->item->vector);
+
+    // Als de heap nog geen k elementen heeft,
+    // voegen we dit item sowieso toe.
+    if(heap.size() < k)
+    {
+        heap.push({
+            distance,
+            node->item
+        });
+    }
+    else
+    {
+        // De MaxHeap bevat op top() het slechtste
+        // resultaat van onze huidige top-k.
         auto top = heap.top();
+
         double worstDistance = top->first;
 
+        // Als het huidige item beter is dan het slechtste
+        // item uit de heap, vervangen we dat item.
         if(distance < worstDistance)
         {
             heap.pop();
-            heap.push({distance, node->vector});
+
+            heap.push({
+                distance,
+                node->item
+            });
         }
     }
 
+    // Afstand tot het scheidingsvlak.
     double planeDistance =
-    std::abs(query.at(node->dimension)- node->vector->at(node->dimension));
+        std::abs(
+            query.at(node->dimension)
+            -
+            node->item->vector.at(node->dimension)
+        );
 
-    if(heap.size() < k || planeDistance < heap.top()->first)
+    // Als de heap nog niet vol zit, moeten we sowieso
+    // verder zoeken.
+    //
+    // Of:
+    // als het andere gebied mogelijk nog een beter punt bevat,
+    // zoeken we daar ook.
+    if(
+        heap.size() < k
+        ||
+        planeDistance < heap.top()->first
+    )
     {
         kNearestNeighbors(second, query, k, heap);
     }
-    
 }
 
-std::vector<const Vector*> KDTree::kNearestNeighbors(const Vector& query,std::size_t k) const
+
+// Publieke functie voor k dichtstbijzijnde KnowledgeItems.
+vector<const KnowledgeItem*> KDTree::kNearestNeighbors(
+    const Vector& query,
+    size_t k) const
 {
     MaxHeap heap;
 
+    // Gebruik de recursieve helper.
     kNearestNeighbors(root, query, k, heap);
 
-    std::vector<const Vector*> neighbors;
+    // De resultaten uit de heap halen.
+    vector<const KnowledgeItem*> neighbors;
 
     while(!heap.empty())
     {
@@ -249,11 +351,12 @@ std::vector<const Vector*> KDTree::kNearestNeighbors(const Vector& query,std::si
         heap.pop();
     }
 
-    std::reverse(neighbors.begin(), neighbors.end());
+    // Heap levert van slecht naar goed.
+    // Daarom draaien we de resultaten om.
+    reverse(
+        neighbors.begin(),
+        neighbors.end()
+    );
 
     return neighbors;
-
-
 }
-
-

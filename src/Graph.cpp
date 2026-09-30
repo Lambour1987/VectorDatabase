@@ -313,6 +313,7 @@ vector<GraphNode*> Graph::reconstructPath(GraphNode* startNode, GraphNode* targe
             path.clear();
             return path;
         }
+        //Hier is -> een iterator
         currentNode = it->second;
 
     }
@@ -416,10 +417,10 @@ void Graph::connectKNearestNeighbors(const KDTree& tree, std::size_t k)
     // genaamd neighbors.
     {
         //16-9-2026: kleine wijziging: k+1 ipv vector<const Vector*> neighbors = tree.kNearestNeighbors(node->vector,k);
-        vector<const Vector*> neighbors = tree.kNearestNeighbors(node->vector,k+1);
+        vector<const KnowledgeItem*> neighbors = tree.kNearestNeighbors(node->vector,k+1);
         // Doorloop alle gevonden neighbors met een pointer
         // genaamd neighbor naar een const Vector.
-        for(const Vector* neighbor:neighbors)
+        for(const KnowledgeItem* neighbor:neighbors)
         {
             // Doorloop alle GraphNodes met een pointer
             // genaamd neighborNode naar een GraphNode.
@@ -428,14 +429,14 @@ void Graph::connectKNearestNeighbors(const KDTree& tree, std::size_t k)
             // Controleer of het adres van de Vector in neighborNode
             // hetzelfde is als de Vector-pointer neighbor.
                 //16-9-2026: Vervang dit if(&neighborNode->vector==neighbor) door
-                if(neighborNode->vector == *neighbor)
+                if(neighborNode->vector == neighbor->vector)
                 // Bereken de afstand tussen node->vector en neighbor.
                 {
                     if(neighborNode->vector == node->vector)
                     {
                         continue;
                     }
-                    double distance = node->vector.distanceTo(*neighbor);
+                    double distance = node->vector.distanceTo(neighbor->vector);
                     // Voeg een edge toe van node naar neighborNode
                     // met distance als gewicht.
                     addEdge(node,neighborNode,distance);

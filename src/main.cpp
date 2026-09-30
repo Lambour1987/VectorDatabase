@@ -210,7 +210,14 @@ int main()
 
     Vector query({4.0, 5.0, 6.0});
 
-    KDTree kdTree(vectors);
+    vector<KnowledgeItem> items;
+
+    for(const Vector& vector : vectors)
+    {
+    items.push_back({vector, "test"});
+    }
+
+    KDTree kdTree(items);
 
     //16-9-2026 Aanroep connectNearestNeighbors
     graph.connectKNearestNeighbors(kdTree, 2);
@@ -218,15 +225,15 @@ int main()
     //16-9-2026: en print Neighbors
     graph.printEdges();
 
-    vector<const Vector*> neighbors =
+    vector<const KnowledgeItem*> neighbors =
         kdTree.kNearestNeighbors(query, 3);
 
     for(size_t i = 0; i < neighbors.size(); ++i)
     {
         cout << "Neighbor " << i + 1 << ": "
-            << neighbors[i]->at(0) << ", "
-            << neighbors[i]->at(1) << ", "
-            << neighbors[i]->at(2)
+            << neighbors[i]->vector.at(0) << ", "
+            << neighbors[i]->vector.at(1) << ", "
+            << neighbors[i]->vector.at(2)
             << endl;
     }
 
