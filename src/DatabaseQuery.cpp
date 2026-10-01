@@ -16,7 +16,8 @@ void voerQueryUit(const VectorDatabase& database)
     //maak een vector van doubles en noem deze queryValues
     vector<double> queryValues;
     //Doorloop alle vectoren. Voeg aan de vector queryValues toe de uitkomst van de vraagDouble functie...
-    for(size_t i=0; i<Vector::MAX_DIMENSIONS; i++)
+    //1-10-2026: aangepast
+    for(size_t i=0; i<3; i++)
     {
         queryValues.push_back(vraagDouble("Geef waarde " + to_string(i+1)+ ": "));
     }

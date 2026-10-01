@@ -22,8 +22,11 @@ src/DatabaseQuery.cpp
 src/MaxHeap.cpp
 src/KDTree.cpp
 src/Graph.cpp
-src/MinHeap.cpp)
+src/MinHeap.cpp
+src/VectorLoader.cpp
+src/TextLoader.cpp
+tests/GraphTest.cpp)
 
 
 # Als je naar headerbestanden zoek, kijk dan ook in include.
-target_include_directories(VectorDatabase PRIVATE include)
+target_include_directories(VectorDatabase PRIVATE include tests)

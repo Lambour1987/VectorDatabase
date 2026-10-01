@@ -1,0 +1,95 @@
+1-10-2026
+
+## Embedding
+
+De map `embedding/` bevat de Python-code voor het genereren van embeddings.
+
+Een **embedding** is een numerieke representatie van tekst. Een embedding-model neemt bijvoorbeeld een zin als:
+
+```text
+"John Coltrane speelde saxofoon."
+```
+
+en zet deze om naar een vector met getallen:
+
+```text
+[0.12, -0.43, 0.08, ..., 0.27]
+```
+
+In dit project gebruiken we voorlopig een bestaand embedding-model. Het model wordt dus **niet zelf getraind**. Ons doel is eerst begrijpen hoe we tekst kunnen omzetten naar vectoren en deze later kunnen gebruiken in onze eigen C++ VectorDatabase.
+
+### Architectuur
+
+```text
+Tekst
+  ↓
+Python
+  ↓
+Embedding model
+  ↓
+Embedding vector
+  ↓
+C++ VectorDatabase
+  ↓
+Vector search / KNN
+```
+
+De Python-code is daarmee verantwoordelijk voor het maken van de embeddings, terwijl de C++ code verantwoordelijk blijft voor het opslaan en doorzoeken van de vectoren.
+
+### Waarom Python?
+
+Embedding-modellen en machine-learning libraries zijn relatief eenvoudig vanuit Python te gebruiken. Daarom houden we de eerste experimenten gescheiden van de C++ database.
+
+Later kunnen we beide delen met elkaar verbinden, bijvoorbeeld:
+
+```text
+Python embedding service
+        ↓
+      384 floats
+        ↓
+C++ VectorDatabase
+```
+
+Een andere mogelijkheid voor later is om het model rechtstreeks vanuit C++ te draaien met bijvoorbeeld ONNX Runtime.
+
+### KnowledgeItem
+
+De uiteindelijke database gebruikt een `KnowledgeItem`:
+
+```cpp
+struct KnowledgeItem
+{
+    Vector vector;
+    std::string text;
+};
+```
+
+Hiermee bewaren we zowel:
+
+* de originele tekst
+* de embedding van die tekst
+
+Bijvoorbeeld:
+
+```text
+KnowledgeItem
+├── text:   "John Coltrane speelde saxofoon."
+└── vector: [0.12, -0.43, 0.08, ...]
+```
+
+Dit is belangrijk voor semantic search en later voor RAG. De vector wordt gebruikt om relevante tekst te vinden, waarna de originele tekst uit het `KnowledgeItem` kan worden gehaald.
+
+### Leerdoel
+
+Het doel van dit onderdeel is niet om zelf een state-of-the-art embedding-model te bouwen. We gebruiken eerst een bestaand model om de volledige keten te begrijpen:
+
+```text
+tekst
+→ embedding
+→ vector
+→ similarity / distance
+→ KNN
+→ relevante tekst
+```
+
+Later kunnen we als apart leerproject zelf een kleine neural network en eventueel een eenvoudige embedding-techniek bouwen om beter te begrijpen wat er onder de motorkap van een embedding-model gebeurt.

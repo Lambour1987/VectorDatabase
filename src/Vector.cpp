@@ -34,13 +34,19 @@ Vector::Vector(initializer_list<double> initialValues):Vector(vector<double>(ini
 }
 
 // HOOFDCONSTRUCTOR
+// 1-10-2026: Aangepast
 // BELANGRIJK: Een constructor kan een andere constructor aanroepen.
-Vector::Vector(const std::vector<double>&initialValues):values(initialValues)
+// Vector::Vector(const std::vector<double>&initialValues):values(initialValues)
+// {
+//     if(initialValues.size() != MAX_DIMENSIONS)
+//     {
+//         throw invalid_argument("Vector must have exactly 3 dimensions");
+//     }
+// }
+
+Vector::Vector(const std::vector<double>& initialValues)
 {
-    if(initialValues.size() != MAX_DIMENSIONS)
-    {
-        throw invalid_argument("Vector must have exactly 3 dimensions");
-    }
+    values = initialValues;
 }
 
 

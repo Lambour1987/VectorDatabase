@@ -41,6 +41,6 @@ class Vector
         //constexpre: Waarde staat al tijdens het compileren vast en kan niet veranderen
         //std::size_t: geschikbt voor aantallen en groottes, zoals dimensies (unsigned integer): Dus je hebt daar functies bij, bijv. size() zodat je direct size kan opvragenn
         //Public: Ook buiten de class te gebruiken.
-        static constexpr std::size_t MAX_DIMENSIONS=3;
+        //1-10-2026: Weggehaald want we gaan nu verder: static constexpr std::size_t MAX_DIMENSIONS=3;
 
 };

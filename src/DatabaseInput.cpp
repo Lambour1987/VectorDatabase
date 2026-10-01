@@ -26,7 +26,8 @@ void vulDatabase(VectorDatabase& database, int aantalVectors)
             vector<double> inputValues;
 
             //Vraag dimensies van deze vector
-            for(size_t j=0; j<Vector::MAX_DIMENSIONS;j++)
+            //1-10-26:aangepast
+            for(size_t j=0; j<3;j++)
             {
                 // Voeg aan queryValues de double functie toe die een vraagDouble() teruggeeft, waarbij de gebruiker wordt
                 // gevraagd om een waarde nummer i+1

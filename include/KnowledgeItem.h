@@ -9,4 +9,8 @@ struct KnowledgeItem
 {
     Vector vector;
     std::string text;
+    KnowledgeItem(const Vector& vector, const std::string& text)
+        : vector(vector), text(text)
+    {
+    }
 };

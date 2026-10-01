@@ -86,8 +86,8 @@ KDNode* KDTree::buildKDTree(
     );
 
     // Ga naar de volgende dimensie.
-    size_t nextDimension =
-        (dimension + 1) % Vector::MAX_DIMENSIONS;
+    //1-10-2026: aangepast size_t nextDimension = (dimension + 1) % Vector::MAX_DIMENSIONS;
+    size_t nextDimension = (dimension + 1) % points[0]->vector.dimension();
 
     // Recursief linker- en rechterdeel bouwen.
     node->left = buildKDTree(leftPoints, nextDimension);
