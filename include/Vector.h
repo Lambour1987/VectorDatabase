@@ -35,12 +35,5 @@ class Vector
         //16-9-2026: Nieuw anders werkt iets niet
         bool operator==(const Vector& other)const;
 
-        //BELANGRIJK:
-        //static: er bestaat 1 MAX_DIMENSIONS voor de hele class Vector (niet 1 waarde voor ieder vector object)
-        // (VS Global variabele: die staat buiten een class)
-        //constexpre: Waarde staat al tijdens het compileren vast en kan niet veranderen
-        //std::size_t: geschikbt voor aantallen en groottes, zoals dimensies (unsigned integer): Dus je hebt daar functies bij, bijv. size() zodat je direct size kan opvragenn
-        //Public: Ook buiten de class te gebruiken.
-        //1-10-2026: Weggehaald want we gaan nu verder: static constexpr std::size_t MAX_DIMENSIONS=3;
 
 };

@@ -5,6 +5,7 @@
 #include "../include/Knowledgeitem.h"
 #include "../include/VectorLoader.h"
 #include "../include/TextLoader.h"
+#include "../include/DatabaseStorage.h"
 #include "GraphTest.h"
 
 //Voor throw exception, try en catch()
@@ -45,6 +46,37 @@ int main()
     }
 
     cout << "Items in VectorDatabase: " << database.size() << endl;
+
+    //5-10-2026 Tijdelijk toevoegen:
+        DatabaseStorage storage;
+
+    storage.save(database, "database.dat");
+
+    VectorDatabase loadedDatabase = storage.load("database.dat");
+
+    cout << "Originele database: " << database.size() << " items" << endl;
+    cout << "Geladen database:   " << loadedDatabase.size() << " items" << endl;
+
+    cout << "\nOriginele tekst: "
+        << database.get(0).text << endl;
+
+    cout << "Geladen tekst:   "
+        << loadedDatabase.get(0).text << endl;
+
+    cout << "Originele dimensie: "
+        << database.get(0).vector.dimension() << endl;
+
+    cout << "Geladen dimensie:   "
+        << loadedDatabase.get(0).vector.dimension() << endl;
+
+    if(database.get(0).vector == loadedDatabase.get(0).vector)
+    {
+        cout << "Vector komt overeen!" << endl;
+    }
+    else
+    {
+        cout << "Vector wijkt af!" << endl;
+    }
 
     //1-10-2026: TIjdelijk toevoegen
     for(std::size_t i = 0; i < database.size(); ++i)

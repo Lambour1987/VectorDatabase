@@ -1,48 +1,19 @@
 //17-8-2026: 
 
 #include "../include/Vector.h"
-#include "KDTree.h"
 
 //18-8-2026: Gebruik voor throw en exception (indien we foutieve waarden in gaan voegen)
-#include <stdexcept>
 #include <cmath>
-#include <algorithm>
 
 using namespace std;
 
-// BELANGRIJK: Eerste Constructor: Kan eruit, want eigenlijk dubbel en 
-// We kiezen een hoofdconstructor die een andere constructor kan aanroepen.
-// ===========DIT WEG==============
-// Vector::Vector(initializer_list<double> initialValues):values(initialValues)
-// {
-//     if(initialValues.size() !=MAX_DIMENSIONS)
-//     {
-//         //18-8-26: in onze V! versie mogen we maar maximaal 3 waarden invoeren. Maar wat als het er meer of minder zijn?
-//         // Dat is fout en die fout moeten we afhandelen met bijv. throw.
-//         // Hier: als er dus meer of minder dan 3 argumenten worden opgegeven (exception), dan gooien (throw) we deze naar
-//         // een plek waar deze opgevangen wordt (catch).
-//         // Momenteel staat de try catch dus in main
-//         throw invalid_argument("Vector must have exactly 3 dimensions");
-//     }
-// }
-// ============TOT HIER WEG ==================
+
 // BELANGRIJK: DUs hier roepen we met de eerste constructor de tweede op:
 // Dit heet een DELEGATING Constructor.
 Vector::Vector(initializer_list<double> initialValues):Vector(vector<double>(initialValues))
 {
 
 }
-
-// HOOFDCONSTRUCTOR
-// 1-10-2026: Aangepast
-// BELANGRIJK: Een constructor kan een andere constructor aanroepen.
-// Vector::Vector(const std::vector<double>&initialValues):values(initialValues)
-// {
-//     if(initialValues.size() != MAX_DIMENSIONS)
-//     {
-//         throw invalid_argument("Vector must have exactly 3 dimensions");
-//     }
-// }
 
 Vector::Vector(const std::vector<double>& initialValues)
 {
@@ -69,7 +40,7 @@ double Vector::distanceTo(const Vector& other) const
     //declaratie en initialisatie van een vector sum met 0.0
     double sum = 0.0;
 
-    //for loop om per Vector door de dimensies te lopen (momenteel 3)
+    //for loop om per Vector door de dimensies te lopen
     for(std::size_t i=0; i<dimension();i++)
     {
         // Dus: we vergelijken hier 2 vectoren: de huidige op index i, en de andere op index i.

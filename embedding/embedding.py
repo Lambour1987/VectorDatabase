@@ -47,12 +47,12 @@ def main():
     ]
 
     #Kanweg: embeddings = model.encode(texts, convert_to_numpy=True)
-    embeddings = create_embeddings(model, texts)
+    #Kanwegembeddings = create_embeddings(model, texts)
 
-    print("Aantal dimensies per vector:", len(embeddings[0]))
+    #KAnwegprint("Aantal dimensies per vector:", len(embeddings[0]))
 
     #2-10-26 Kanweg: np.savetxt(embedding_dir / "vectors.txt", embeddings)
-    vectors_path = embedding_dir / "vectors.txt"
+    #Kanwegvectors_path = embedding_dir / "vectors.txt"
     #2-10-26: kanweg? np.savetxt(vectors_path, embeddings)
 
     # Hiermee slaan we ook de originele teksten op:
@@ -60,13 +60,18 @@ def main():
     # De teksten en vectoren moeten dezelfde volgorde behouden,
     # zodat tekst 1 bij vector 1 hoort, tekst 2 bij vector 2, enzovoort.
     # Kanweg: with open(embedding_dir / "texts.txt", "w", encoding="utf-8") as file:
-    texts_path = embedding_dir / "texts.txt"
+    #Kanwegtexts_path = embedding_dir / "texts.txt"
 
-    save_vectors(vectors_path, embeddings)
-    save_texts(texts_path, texts)
+    #Kanwegsave_vectors(vectors_path, embeddings)
+    #Kanweg save_texts(texts_path, texts)
 
     # Nieuwe zoekopdracht
     # 2-10-26: ipv hardcoded query = "Hoe werkt een elektrische auto?" nu:
+
+
+    # De knowledge vectors zijn al eerder gemaakt.
+    # Tijdens een query hoeven we die niet opnieuw te berekenen.
+
     # Nieuwe zoekopdracht vanuit de command line
     if len(sys.argv) < 2:
         print('Gebruik: python embedding\\embedding.py "jouw vraag"')
