@@ -6,6 +6,7 @@
 #include "../include/VectorLoader.h"
 #include "../include/TextLoader.h"
 #include "../include/DatabaseStorage.h"
+#include "../include/BTreeTest.h"
 #include "GraphTest.h"
 
 //Voor throw exception, try en catch()
@@ -121,6 +122,7 @@ int main()
     }
 
     runGraphTests();
+    runBTreeTests();
 
     return 0;
 }

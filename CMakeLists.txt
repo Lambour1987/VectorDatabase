@@ -26,7 +26,9 @@ src/MinHeap.cpp
 src/VectorLoader.cpp
 src/TextLoader.cpp
 tests/GraphTest.cpp
-src/DatabaseStorage.cpp)
+src/DatabaseStorage.cpp
+src/BTree.cpp
+tests/BTreeTest.cpp)
 
 
 # Als je naar headerbestanden zoek, kijk dan ook in include.
