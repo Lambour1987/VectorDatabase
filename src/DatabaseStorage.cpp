@@ -111,9 +111,9 @@ VectorDatabase DatabaseStorage::load(const string& filename) const
 
        Vector vector(values);
 
-        KnowledgeItem item(vector, text);
+        //Kanweg KnowledgeItem item(vector, text);
 
-        database.add(item);
+        database.add(vector, text);
 
     }
     return database;

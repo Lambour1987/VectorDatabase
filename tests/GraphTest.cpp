@@ -200,7 +200,7 @@ void runGraphTests()
 
     for(const Vector& vector : vectors)
     {
-    items.push_back({vector, "test"});
+    items.push_back({1,vector, "test"});
     }
 
     KDTree kdTree(items);

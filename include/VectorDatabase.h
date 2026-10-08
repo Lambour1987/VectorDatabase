@@ -4,7 +4,12 @@
 
 #include "Vector.h"
 #include "KnowledgeItem.h" //29-9-26 toegevoegd
+#include "BTree.h" //8-10-26 Toegevoegd
 #include <vector>
+#include <string>
+//8-10-2026: Include Memory
+#include <memory>
+
 
 //19-8-2026: struct maken: dit omdat we in een functie een return willen geven die meerdere waarden bevat
 // waarvan we de betekenis ook willen weten. Namelijk om welke vectoren het gaat en welke afstand het is.
@@ -29,17 +34,24 @@ class VectorDatabase
     private:
         //een vector van onze eigen class Vector
         // 29-9-2026 gewijzigd van std::vector<Vector> vectors;
-        std::vector<KnowledgeItem> items;
+        // 8-10-2026: gewijzigd van std::vector<KnowledgeItem> items;
+        std::vector<std::unique_ptr<KnowledgeItem>> items;
+        int nextId = 1;
+        BTree idIndex;
     
     public:
         //Functie om Vector(mijn eigen Class) toe te voegen aan de database.
-        void add(const KnowledgeItem& vector);
+        void add(const Vector& vector, const std::string& text);
         std::size_t size() const;
 
         //Functie om vectors terug te vinden
         //1e const: je krijgt een referentie terug naar een Vector, die je niet kan aanpassen. 
         //2e const: je kan het object van de functie zelf niet aanpassen.
         const KnowledgeItem& get(std::size_t index) const;
+        const KnowledgeItem& getById(int id) const;
+
+        //8-10-2026
+        bool containsId(int id) const;
 
         //19-8-26: Functie die beoordeelt welke Vector het dichtst bij ligt (bij wat ligt?)
         // 19-8-26: aangepast van: const Vector& findNearest(const Vector& query) const;naar:
@@ -49,7 +61,7 @@ class VectorDatabase
         std::vector<NearestResult> findNearestK(const Vector& query, std::size_t k) const;
 
         //28-8-26: Functie toevoegen
-        const std::vector<KnowledgeItem>& getVectors() const;
-        
+        //8-10-2026: Tijdelijk Aangepast van const std::vector<KnowledgeItem>& getVectors() const; naar
+        const std::vector<std::unique_ptr<KnowledgeItem>>& getVectors() const;
 };
 

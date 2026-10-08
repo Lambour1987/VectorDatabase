@@ -31,25 +31,30 @@ int main()
         throw std::runtime_error("Aantal vectors en teksten komt niet overeen.");
     }
 
-    // Maak KnowledgeItems
-    std::vector<KnowledgeItem> knowledgeItems;
+    // // Maak KnowledgeItems
+    // std::vector<KnowledgeItem> knowledgeItems;
+
+    // for(std::size_t i = 0; i < loadedVectors.size(); ++i)
+    // {
+    //     //weg?KnowledgeItem item(Vector(loadedVectors[i]),loadedTexts[i]);
+    //     knowledgeItems.push_back(item);
+    // }
+
+    // // Voeg alle KnowledgeItems toe aan de VectorDatabase
+    // for(const auto& item : knowledgeItems)
+    // {
+    //    database.add(Vector(loadedVectors[i]), loadedTexts[i]);
+    // }
 
     for(std::size_t i = 0; i < loadedVectors.size(); ++i)
     {
-        KnowledgeItem item(Vector(loadedVectors[i]),loadedTexts[i]);
-        knowledgeItems.push_back(item);
-    }
-
-    // Voeg alle KnowledgeItems toe aan de VectorDatabase
-    for(const auto& item : knowledgeItems)
-    {
-        database.add(item);
+    database.add(Vector(loadedVectors[i]), loadedTexts[i]);
     }
 
     cout << "Items in VectorDatabase: " << database.size() << endl;
 
     //5-10-2026 Tijdelijk toevoegen:
-        DatabaseStorage storage;
+    DatabaseStorage storage;
 
     storage.save(database, "database.dat");
 
@@ -80,11 +85,13 @@ int main()
     }
 
     //1-10-2026: TIjdelijk toevoegen
+    //7-10-2026: Aangepast
     for(std::size_t i = 0; i < database.size(); ++i)
     {
-        const KnowledgeItem& item = database.get(i);
+        const auto& item = database.get(i);
 
-        cout << "\nItem " << i << ":" << endl;
+        cout << "Item " << i << ":" << endl;
+        cout << "ID: " << item.id << endl;
         cout << "Tekst: " << item.text << endl;
         cout << "Dimensies: " << item.vector.dimension() << endl;
     }

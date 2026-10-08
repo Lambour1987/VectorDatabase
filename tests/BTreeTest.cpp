@@ -1,7 +1,8 @@
 //6-10-2026
 
-#include "../include/BTree.h"
+//6-10-2026
 
+#include "../include/BTree.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -15,18 +16,18 @@ void runBTreeTests()
     BTree tree;
 
     // Deze waarden zorgen voor meerdere splitsingen.
-    tree.insert(50);
-    tree.insert(30);
-    tree.insert(70);
-    tree.insert(10);
-    tree.insert(40);
-    tree.insert(60);
-    tree.insert(80);
-    tree.insert(20);
-    tree.insert(35);
-    tree.insert(45);
+    tree.insert(50, nullptr);
+    tree.insert(30, nullptr);
+    tree.insert(70, nullptr);
+    tree.insert(10, nullptr);
+    tree.insert(40, nullptr);
+    tree.insert(60, nullptr);
+    tree.insert(80, nullptr);
+    tree.insert(20, nullptr);
+    tree.insert(35, nullptr);
+    tree.insert(45, nullptr);
 
-    //Print boom
+    // Print boom
     cout << "\nBTree structure:" << endl;
     tree.print();
 
@@ -75,16 +76,16 @@ void runBTreeTests()
 
     BTree mergeTree;
 
-    mergeTree.insert(50);
-    mergeTree.insert(30);
-    mergeTree.insert(70);
-    mergeTree.insert(10);
-    mergeTree.insert(20);
-    mergeTree.insert(60);
-    mergeTree.insert(80);
-    mergeTree.insert(35);
-    mergeTree.insert(40);
-    mergeTree.insert(45);
+    mergeTree.insert(50, nullptr);
+    mergeTree.insert(30, nullptr);
+    mergeTree.insert(70, nullptr);
+    mergeTree.insert(10, nullptr);
+    mergeTree.insert(20, nullptr);
+    mergeTree.insert(60, nullptr);
+    mergeTree.insert(80, nullptr);
+    mergeTree.insert(35, nullptr);
+    mergeTree.insert(40, nullptr);
+    mergeTree.insert(45, nullptr);
 
     cout << "\nMerge test - initial tree:" << endl;
     mergeTree.print();
@@ -110,16 +111,16 @@ void runBTreeTests()
 
     BTree nextTree;
 
-    nextTree.insert(50);
-    nextTree.insert(30);
-    nextTree.insert(70);
-    nextTree.insert(10);
-    nextTree.insert(20);
-    nextTree.insert(60);
-    nextTree.insert(80);
-    nextTree.insert(35);
-    nextTree.insert(40);
-    nextTree.insert(45);
+    nextTree.insert(50, nullptr);
+    nextTree.insert(30, nullptr);
+    nextTree.insert(70, nullptr);
+    nextTree.insert(10, nullptr);
+    nextTree.insert(20, nullptr);
+    nextTree.insert(60, nullptr);
+    nextTree.insert(80, nullptr);
+    nextTree.insert(35, nullptr);
+    nextTree.insert(40, nullptr);
+    nextTree.insert(45, nullptr);
 
     cout << "\nBorrow from next - initial tree:" << endl;
     nextTree.print();
@@ -143,16 +144,16 @@ void runBTreeTests()
 
     BTree previousTree;
 
-    previousTree.insert(50);
-    previousTree.insert(30);
-    previousTree.insert(70);
-    previousTree.insert(10);
-    previousTree.insert(20);
-    previousTree.insert(60);
-    previousTree.insert(80);
-    previousTree.insert(35);
-    previousTree.insert(40);
-    previousTree.insert(45);
+    previousTree.insert(50, nullptr);
+    previousTree.insert(30, nullptr);
+    previousTree.insert(70, nullptr);
+    previousTree.insert(10, nullptr);
+    previousTree.insert(20, nullptr);
+    previousTree.insert(60, nullptr);
+    previousTree.insert(80, nullptr);
+    previousTree.insert(35, nullptr);
+    previousTree.insert(40, nullptr);
+    previousTree.insert(45, nullptr);
 
     cout << "\nBorrow from previous - initial tree:" << endl;
     previousTree.print();
@@ -181,10 +182,10 @@ void runBTreeTests()
 
     BTree rootTree;
 
-    rootTree.insert(10);
-    rootTree.insert(20);
-    rootTree.insert(30);
-    rootTree.insert(40);
+    rootTree.insert(10, nullptr);
+    rootTree.insert(20, nullptr);
+    rootTree.insert(30, nullptr);
+    rootTree.insert(40, nullptr);
 
     cout << "\nRoot shrink - initial tree:" << endl;
     rootTree.print();
@@ -207,16 +208,16 @@ void runBTreeTests()
 
     BTree internalTree;
 
-    internalTree.insert(50);
-    internalTree.insert(30);
-    internalTree.insert(70);
-    internalTree.insert(10);
-    internalTree.insert(20);
-    internalTree.insert(60);
-    internalTree.insert(80);
-    internalTree.insert(35);
-    internalTree.insert(40);
-    internalTree.insert(45);
+    internalTree.insert(50, nullptr);
+    internalTree.insert(30, nullptr);
+    internalTree.insert(70, nullptr);
+    internalTree.insert(10, nullptr);
+    internalTree.insert(20, nullptr);
+    internalTree.insert(60, nullptr);
+    internalTree.insert(80, nullptr);
+    internalTree.insert(35, nullptr);
+    internalTree.insert(40, nullptr);
+    internalTree.insert(45, nullptr);
 
     cout << "\nInternal deletion - initial tree:" << endl;
     internalTree.print();
@@ -232,5 +233,4 @@ void runBTreeTests()
 
     cout << "\nInternal deletion - after deleting 30:" << endl;
     internalTree.print();
-
 }

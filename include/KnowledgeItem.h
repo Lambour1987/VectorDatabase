@@ -7,10 +7,13 @@
 
 struct KnowledgeItem
 {
+    //7-10-2026: Toegevoegd
+    int id;
     Vector vector;
     std::string text;
-    KnowledgeItem(const Vector& vector, const std::string& text)
-        : vector(vector), text(text)
+
+    KnowledgeItem(int id, const Vector& vector, const std::string& text)
+        : id(id),vector(vector), text(text)
     {
     }
 };

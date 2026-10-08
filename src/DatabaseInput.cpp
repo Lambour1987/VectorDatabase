@@ -38,7 +38,7 @@ void vulDatabase(VectorDatabase& database, int aantalVectors)
             { 
                 // Gewijzigd van Vector v({x, y, z}); naar
                 Vector v(inputValues);
-                database.add({v, "test"});
+                database.add(v, "test");
                 cout<<"Vector toegevoegd! "<<endl;
                 cout<<"Aantal vectors: "<<database.size()<<endl;
                 //Vector Succesvol aangemaakt, dus true

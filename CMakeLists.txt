@@ -30,6 +30,14 @@ src/DatabaseStorage.cpp
 src/BTree.cpp
 tests/BTreeTest.cpp)
 
+# VectorDatabase tests
+add_executable(VectorDatabaseTest
+    tests/VectorDatabaseTest.cpp
+    src/Vector.cpp
+    src/VectorDatabase.cpp
+    src/MaxHeap.cpp
+    src/BTree.cpp
+)
 
 # Als je naar headerbestanden zoek, kijk dan ook in include.
 target_include_directories(VectorDatabase PRIVATE include tests)

@@ -1,6 +1,7 @@
 //18-8-2026 Gemaakt
-#include "../include/VectorDatabase.h"
 #include "../include/MaxHeap.h"
+#include "../include/VectorDatabase.h"
+#include "../include/KnowledgeItem.h"
 
 //Om runtime errors op te vangen
 #include <stdexcept>
@@ -21,9 +22,29 @@ struct CompareDistance
 
 
 
-void VectorDatabase::add(const KnowledgeItem& item)
+// //8-10-26: void VectorDatabase::add(const Vector& vector, const std::string& text)
+// {
+//     auto item = std::make_unique<KnowledgeItem>(nextId,vector,text);
+
+//     items.push_back(std::move(item));
+
+//     nextId++;
+// }
+void VectorDatabase::add(const Vector& vector, const string& text)
 {
-    items.push_back(item);
+    auto item = make_unique<KnowledgeItem>(
+        nextId,
+        vector,
+        text
+    );
+
+    KnowledgeItem* itemPointer = item.get();
+
+    items.push_back(move(item));
+
+    idIndex.insert(itemPointer->id, itemPointer);
+
+    nextId++;
 }
 
 size_t VectorDatabase::size() const
@@ -32,7 +53,11 @@ size_t VectorDatabase::size() const
 }
 
 //30-9-2026: Deze functie ombouwen
-const vector<KnowledgeItem>& VectorDatabase::getVectors() const
+//8-10-2026: Tijdelijk aanpassen const vector<KnowledgeItem>& VectorDatabase::getVectors() const
+//{
+    //return items;
+//}
+const vector<unique_ptr<KnowledgeItem>>& VectorDatabase::getVectors() const
 {
     return items;
 }
@@ -41,7 +66,7 @@ const vector<KnowledgeItem>& VectorDatabase::getVectors() const
 // BELANGRIJK: ipv vectors[index] doen we vectors.at(index): Die controleert gelijk of de index geldig is.
 const KnowledgeItem& VectorDatabase::get(std::size_t index) const
 {
-    return items.at(index);
+    return *items.at(index);
 }
 
 
@@ -66,14 +91,14 @@ NearestResult VectorDatabase::findNearest(const Vector&query) const
     // de afstand tussen qeury en de eerste Vector in de database.
     // Let op: we houden logischerwijs tijdens het doorlopen van de database als het kleinste element bij, dat
     // scheelt straks als we in O(n) nogmaals de hele vector zouden moeten doorlopen met de 'min' functie. 
-    double smallestDistance = query.distanceTo(items.at(0).vector);
-
+    //8-10-26: dus van double smallestDistance = query.distanceTo(items.at(0).vector); want unique pointer
+    double smallestDistance = query.distanceTo(items.at(0)->vector);
     //Loop vanaf de tweede vector naar het einde van de vectorDatabase. (de eerste was al opgenomen)
     for(size_t i = 1; i<items.size();i++)
     {
         // Bereken de afstand van huidige vector met de andere vector door het oproepen van de distance functie
         // en sla de uitkomst op in een variabele distance van het datatype double
-        double distance = query.distanceTo(items.at(i).vector);
+        double distance = query.distanceTo(items.at(i)->vector);
 
         // Als de huidige afstand kleiner is dan de kleinste afstand, dan wordt de kleinste afstand de huidige afstand
         // en dan wordt bestIndex de huidige index waar we nu op staan
@@ -85,7 +110,8 @@ NearestResult VectorDatabase::findNearest(const Vector&query) const
     }
     //19-8-26:
     //20-8-26: gewijzigd omdat we ipv referentie nu met pointers gaan werken. was: NearestResult result{vectors.at(bestIndex), smallestDistance}; wordt:
-    NearestResult result{&items.at(bestIndex), smallestDistance};
+    //8-10-2026: gewijzigd NearestResult result{&items.at(bestIndex), smallestDistance};
+    NearestResult result{items.at(bestIndex).get(),smallestDistance};
 
     // Return de vector op de beste index.
     // 19-8-26 Nu dit aanpassen omdat we de functie hebben aangepast return vectors.at(bestIndex);
@@ -121,8 +147,8 @@ std::vector<NearestResult> VectorDatabase::findNearestK(const Vector& query, siz
     {
         //maak een variabele distance van het type double die met de afstand tussen query en de Vector op index i
         //30-9-2026: er staat nu dus items.at. Maar kan nog niet omdat de MaxHeap nog aangepast moet worden.
-        double distance = query.distanceTo(items.at(i).vector);
-
+        //8-10-2026: Gewijzigd van double distance = query.distanceTo(items.at(i).vector);
+        double distance = query.distanceTo(items.at(i)->vector);
         // Maak een NearestResult-object en noem deze result en initialiseer de referentie naar
         // de huidige Vector en de bijbehorende afstand.
         // We gaan nu met pointers werken ipv referenties dus NearestResult result{vectors.at(i), distance}; wordt
@@ -137,7 +163,8 @@ std::vector<NearestResult> VectorDatabase::findNearestK(const Vector& query, siz
         
         //voeg resultaat toe aan heap result
         // 25-8-26: MaxHeap dus pair {} nodig ipv heap.push(result); wordt
-        heap.push({distance, &items.at(i)});
+        //8-10-2026 heap.push({distance, &items.at(i)});
+        heap.push({distance, items.at(i).get()});
         //20-8-26: wordt een heap results.push_back(result);
         //Als heap groter is dan k
         if(heap.size()>k)
@@ -169,4 +196,22 @@ std::vector<NearestResult> VectorDatabase::findNearestK(const Vector& query, siz
     // retourneer resultaat
     return results;
 
+}
+
+const KnowledgeItem& VectorDatabase::getById(int id) const
+{
+    const KnowledgeItem* item = idIndex.find(id);
+
+    if(item == nullptr)
+    {
+        throw std::runtime_error("ID not found");
+    }
+
+    return *item;
+}
+
+//8-10-2026 Toegevoegd
+bool VectorDatabase::containsId(int id) const
+{
+    return idIndex.find(id) != nullptr;
 }
