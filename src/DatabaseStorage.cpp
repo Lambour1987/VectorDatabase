@@ -14,8 +14,6 @@ using namespace std;
 
 namespace DatabaseStorageInternal
 {
-    //using WriteFunction = function<void(ostream&)>;
-
     void writeDatabase(const VectorDatabase& database, ostream& output)
     {
         const size_t itemCount = database.size();
@@ -67,10 +65,25 @@ void DatabaseStorage::save(const VectorDatabase& database, const string& filenam
         throw runtime_error("Could not open database file for writing");
     }
 
-    //writeDatabase(database, file);
     DatabaseStorageInternal::writeDatabase(database, file);
 }
 
+
+//13-10-2026: Met chat hulp dit commentaar gemaakt:
+// Ontwerpkeuze (13-10-2026):
+// Databasebestanden worden voorlopig strikt gevalideerd.
+// Ongeldige of onvolledige gegevens worden afgewezen.
+// Ook onverwachte extra bytes aan het einde van het bestand
+// moeten worden afgewezen zodra deze controle is geïmplementeerd.
+//
+// Reden: in deze beginfase geven we betrouwbaarheid en het
+// vroeg ontdekken van beschadigde bestanden voorrang.
+//
+// Toekomstige mogelijkheid:
+// Bij de introductie van versiebeheer of een uitgebreider
+// bestandsformaat kan deze strikte controle bewust worden herzien.
+// Eventuele uitbreidingen moeten expliciet worden ondersteund;
+// willekeurige extra bytes worden niet automatisch geaccepteerd.
 VectorDatabase DatabaseStorage::load(const string& filename) const
 {
     ifstream file(filename, ios::binary);
@@ -149,10 +162,19 @@ VectorDatabase DatabaseStorage::load(const string& filename) const
                 throw runtime_error("Invalid database file: incomplete vector data");
             }
         }
-
         Vector vector(values);
         database.add(vector, text);
     }
+    // 13-10-2026
+    // Controleer of het volledige bestand precies is ingelezen.
+    // Onverwachte extra bytes worden voorlopig afgewezen.
+    if (file.peek() != char_traits<char>::eof())
+    {
+        throw runtime_error(
+            "Invalid database file: unexpected trailing data"
+        );
+    }
 
     return database;
+
 }

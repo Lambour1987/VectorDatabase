@@ -83,6 +83,37 @@ int main()
 
     cout << "PASS: normal save/load roundtrip\n";
 
+    //13-10-2026: weer wat tussengevoegd
+    // 2. Een bestand met extra bytes achter de database moet worden afgewezen
+    const string trailingDataFile = "DatabaseStorageTest_trailing.dat";
+    storage.save(original, trailingDataFile);
+
+    {
+        FILE* file = std::fopen(trailingDataFile.c_str(), "ab");
+        assert(file != nullptr);
+
+        const char extraData[] = {0x12, 0x34, 0x56};
+        std::fwrite(extraData, sizeof(extraData), 1, file);
+        std::fclose(file);
+    }
+
+    bool trailingDataRejected = false;
+
+    try
+    {
+        storage.load(trailingDataFile);
+    }
+    catch (const runtime_error&)
+    {
+        trailingDataRejected = true;
+    }
+
+    assert(trailingDataRejected);
+    cout << "PASS: trailing data rejected\n";
+    std::remove(trailingDataFile.c_str());
+
+
+
     // 2. Een niet-bestaand bestand moet een fout opleveren
     std::remove(missingFile.c_str());
 
