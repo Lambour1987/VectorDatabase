@@ -41,3 +41,15 @@ add_executable(VectorDatabaseTest
 
 # Als je naar headerbestanden zoek, kijk dan ook in include.
 target_include_directories(VectorDatabase PRIVATE include tests)
+
+# DatabaseStorage tests
+add_executable(DatabaseStorageTest
+    tests/DatabaseStorageTest.cpp
+    src/DatabaseStorage.cpp
+    src/Vector.cpp
+    src/VectorDatabase.cpp
+    src/MaxHeap.cpp
+    src/BTree.cpp
+)
+
+target_include_directories(DatabaseStorageTest PRIVATE include tests)
