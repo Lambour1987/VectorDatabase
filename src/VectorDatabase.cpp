@@ -293,3 +293,78 @@ std::vector<NearestResult> VectorDatabase::findNearestKInIdRange(
 
     return results;
 }
+
+//13-10-2026: Overloaded functie
+
+std::vector<NearestResult> VectorDatabase::findNearestKInIdRange(
+    const Vector& query,
+    size_t k,
+    int minId,
+    int maxId,
+    double maxDistance
+) const
+{
+    if (k == 0)
+    {
+        throw invalid_argument("k must be greater than 0");
+    }
+
+    if (minId > maxId)
+    {
+        throw invalid_argument("minId must not be greater than maxId");
+    }
+
+    if (maxDistance < 0.0)
+    {
+        throw invalid_argument("maxDistance must not be negative");
+    }
+
+    // Stap 1: haal kandidaten binnen het ID-bereik op.
+    const std::vector<const KnowledgeItem*> candidates =
+        findByIdRange(minId, maxId);
+
+    // Stap 2: bereken afstanden en behoud alleen geldige kandidaten.
+    MaxHeap heap;
+
+    for (const KnowledgeItem* item : candidates)
+    {
+        const double distance = query.distanceTo(item->vector);
+
+        // Afstanden boven de grens worden uitgesloten.
+        if (distance > maxDistance)
+        {
+            continue;
+        }
+
+        heap.push({distance, item});
+
+        // Bewaar maximaal k resultaten.
+        if (heap.size() > k)
+        {
+            heap.pop();
+        }
+    }
+
+    // Stap 3: zet de resultaten om naar een vector.
+    std::vector<NearestResult> results;
+
+    while (!heap.empty())
+    {
+        const auto result = heap.top();
+
+        if (result.has_value())
+        {
+            results.push_back({
+                result->second,
+                result->first
+            });
+
+            heap.pop();
+        }
+    }
+
+    // De heap levert de grootste afstand eerst; draai de volgorde om.
+    reverse(results.begin(), results.end());
+
+    return results;
+}

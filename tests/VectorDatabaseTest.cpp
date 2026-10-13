@@ -168,6 +168,50 @@ int main()
     assert(noMatches.empty());
     cout << "Empty candidate range edge case passed!" << endl;
 
+    //13-10-2026: Toegevoegd
+    // Test: maxDistance = 0 accepteert alleen een exacte match.
+    const auto exactResults =
+        database.findNearestKInIdRange(query, 3, 1, 6, 0.0);
+
+    assert(exactResults.size() == 1);
+    assert(exactResults[0].item->id == 2);
+    assert(exactResults[0].distance == 0.0);
+
+    cout << "Max-distance exact-match test passed!" << endl;
+
+
+    // Test: resultaten boven de afstandsgrens worden uitgesloten.
+    const auto limitedResults =
+        database.findNearestKInIdRange(query, 3, 1, 6, 5.5);
+
+    assert(limitedResults.size() == 3);
+    assert(limitedResults[0].item->id == 2);
+    assert(limitedResults[0].distance == 0.0);
+    assert(limitedResults[1].distance <= 5.5);
+    assert(limitedResults[2].distance <= 5.5);
+
+    // ID 1 en ID 3 liggen beide op afstand sqrt(27), ongeveer 5.196.
+    assert(
+        limitedResults[1].item->id == 1 ||
+        limitedResults[1].item->id == 3
+    );
+    assert(limitedResults[1].distance <= 5.5);
+
+    cout << "Max-distance filtering test passed!" << endl;
+
+    // Test: een negatieve maximale afstand is ongeldig.
+    bool negativeDistanceThrows = false;
+
+    try {
+        database.findNearestKInIdRange(query, 3, 1, 6, -1.0);
+    }
+    catch (const std::invalid_argument&) {
+        negativeDistanceThrows = true;
+    }
+
+    assert(negativeDistanceThrows);
+
+    cout << "Negative max-distance test passed!" << endl;
 
     return 0;
 }

@@ -70,7 +70,14 @@ class VectorDatabase
         //13-10-2026: Toegevoegd:
         std::vector<NearestResult> findNearestKInIdRange(const Vector& query,size_t k,int minId,int maxId) const;
 
+        //13-10-2026: Toegevoegd overload van findNearestKIdRange
         
+        //13-10-2026: ID-range zoeken met maximale vectorafstand (dus meerdere functies met dezelfde naam mogelijk als het aantal parameters verschilt)
+        //Bestaande code hoeven we niet aan te passen
+        std::vector<NearestResult> findNearestKInIdRange(const Vector& query,size_t k,int minId,int maxId,double maxDistance) const;
+
+
+
 
 
 
