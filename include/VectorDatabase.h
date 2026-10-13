@@ -5,10 +5,15 @@
 #include "Vector.h"
 #include "KnowledgeItem.h" //29-9-26 toegevoegd
 #include "BTree.h" //8-10-26 Toegevoegd
+//13-10-2026: toegevoegd
+#include "KDTree.h"
+
 #include <vector>
 #include <string>
 //8-10-2026: Include Memory
 #include <memory>
+
+
 
 
 //19-8-2026: struct maken: dit omdat we in een functie een return willen geven die meerdere waarden bevat
@@ -38,6 +43,10 @@ class VectorDatabase
         std::vector<std::unique_ptr<KnowledgeItem>> items;
         int nextId = 1;
         BTree idIndex;
+
+        mutable std::unique_ptr<KDTree> kdTree;
+        mutable bool kdTreeDirty = true;
+        void ensureKDTree() const;
     
     public:
         //Functie om Vector(mijn eigen Class) toe te voegen aan de database.

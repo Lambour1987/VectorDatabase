@@ -6,9 +6,11 @@
 #include "MaxHeap.h"
 #include "KnowledgeItem.h"
 
+
 //geeft standaard C++ types zoals std::size_t
 #include <cstddef>
 #include <vector>
+#include <memory>
 
 struct KDNode
 {
@@ -45,7 +47,9 @@ class KDTree
 
     public:
         //22-9-2026: constructor
+        //13-10-2026
         KDTree(const std::vector<KnowledgeItem>& items);
+        KDTree(const std::vector<std::unique_ptr<KnowledgeItem>>& items);
         //15-9-2026: Toegevoegd t.b.v. NearestNeighbors uit Heap zoeken: let op: dezelfde naam als
         // die in de private functie: dit is overloading.
         std::vector<const KnowledgeItem*> kNearestNeighbors(const Vector& query, std::size_t k) const;

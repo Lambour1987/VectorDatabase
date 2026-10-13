@@ -5,6 +5,9 @@
 //18-8-2026: Gebruik voor throw en exception (indien we foutieve waarden in gaan voegen)
 #include <cmath>
 
+//13-10-2026
+#include <stdexcept>
+
 using namespace std;
 
 
@@ -32,28 +35,51 @@ double Vector::at(size_t index) const
     return values.at(index);
 }
 
+//13-10-2026: Mag weg als ander deel werkt
 // 19-8-2026: Deze functie berekent de afstand van huidige Vector met 1 andere vector.
 // Deze functie wordt zo vaak als er Vectoren zijn in de vectorDatabase opgeroepen. Want iedere
 // vector moet met elke andere vector uit de database worden vergeleken.
+// double Vector::distanceTo(const Vector& other) const
+// {
+//     //declaratie en initialisatie van een vector sum met 0.0
+//     double sum = 0.0;
+
+//     //for loop om per Vector door de dimensies te lopen
+//     for(std::size_t i=0; i<dimension();i++)
+//     {
+//         // Dus: we vergelijken hier 2 vectoren: de huidige op index i, en de andere op index i.
+//         // De andere moeten we nog doorgeven.
+//         double difference = at(i) - other.at(i);
+
+//         //We kwadrateren het verschil en tellen deze op
+//         sum += difference*difference;
+
+//     }
+//     // Van de totale som doen we de wortel en dat is het antwoord.
+//     return sqrt(sum);
+// }
+
+
 double Vector::distanceTo(const Vector& other) const
 {
-    //declaratie en initialisatie van een vector sum met 0.0
+    if (dimension() != other.dimension())
+    {
+        throw std::invalid_argument(
+            "Cannot calculate distance between vectors with different dimensions"
+        );
+    }
+
     double sum = 0.0;
 
-    //for loop om per Vector door de dimensies te lopen
-    for(std::size_t i=0; i<dimension();i++)
+    for (std::size_t i = 0; i < dimension(); i++)
     {
-        // Dus: we vergelijken hier 2 vectoren: de huidige op index i, en de andere op index i.
-        // De andere moeten we nog doorgeven.
         double difference = at(i) - other.at(i);
-
-        //We kwadrateren het verschil en tellen deze op
-        sum += difference*difference;
-
+        sum += difference * difference;
     }
-    // Van de totale som doen we de wortel en dat is het antwoord.
+
     return sqrt(sum);
 }
+
 
 bool Vector::operator==(const Vector& other) const
 {

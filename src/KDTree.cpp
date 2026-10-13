@@ -1,4 +1,5 @@
 //25-8-2026
+//13-10-2026: Dus dit waarschijnlijk nog veranderen naar een HNSW
 
 #include "../include/KDTree.h"
 #include "../include/MaxHeap.h"
@@ -13,21 +14,36 @@ using namespace std;
 // Constructor
 // De KDTree krijgt nu een vector met KnowledgeItems.
 // Ieder KnowledgeItem bevat zelf een Vector in .vector.
+
 KDTree::KDTree(const vector<KnowledgeItem>& items)
     : root(nullptr)
 {
-    // Hier bewaren we pointers naar de KnowledgeItems.
     vector<const KnowledgeItem*> points;
+    points.reserve(items.size());
 
-    for(const KnowledgeItem& item : items)
+    for (const KnowledgeItem& item : items)
     {
         points.push_back(&item);
     }
 
-    // Start de recursieve opbouw bij dimensie 0.
     root = buildKDTree(points, 0);
 }
+// 13-10-2026: nieuw
+KDTree::KDTree(
+    const vector<unique_ptr<KnowledgeItem>>& items
+)
+    : root(nullptr)
+{
+    vector<const KnowledgeItem*> points;
+    points.reserve(items.size());
 
+    for (const auto& item : items)
+    {
+        points.push_back(item.get());
+    }
+
+    root = buildKDTree(points, 0);
+}
 
 // 28-8-2026: KDTree basecase
 KDNode* KDTree::buildKDTree(

@@ -2,6 +2,9 @@
 #include <cassert>
 #include <iostream>
 #include <stdexcept>
+#include <algorithm>
+#include <cmath>
+#include <vector>
 
 using namespace std;
 
@@ -213,5 +216,110 @@ int main()
 
     cout << "Negative max-distance test passed!" << endl;
 
+    //13-10-2026: nog een test
+        // Test: afstand tussen vectoren met dezelfde dimensie.
+    Vector distanceVector1{1.0, 2.0};
+    Vector distanceVector2{4.0, 6.0};
+
+    const double distance =
+        distanceVector1.distanceTo(distanceVector2);
+
+    assert(distance == 5.0);
+
+    cout << "Same-dimension distance test passed!" << endl;
+
+
+    // Test: vectoren met verschillende dimensies moeten worden geweigerd.
+    Vector differentDimensionVector{1.0, 2.0, 3.0};
+
+    bool dimensionMismatchThrows = false;
+
+    try
+    {
+        distanceVector1.distanceTo(differentDimensionVector);
+    }
+    catch (const std::invalid_argument&)
+    {
+        dimensionMismatchThrows = true;
+    }
+
+    assert(dimensionMismatchThrows);
+
+    cout << "Different-dimension distance test passed!" << endl;
+
+    //13-10-2026: nieuwe toegevoegd
+    
+    // 13-10-2026: KD-tree-integratietests
+
+    // Test 1: vergelijk findNearestK met brute force.
+    const Vector kdQuery{5.0, 6.0, 7.0};
+
+    const auto kdResults = database.findNearestK(kdQuery, 3);
+
+    // Onafhankelijke brute-forceberekening over alle items.
+    std::vector<NearestResult> bruteForceResults;
+
+    for (std::size_t i = 0; i < database.size(); ++i)
+    {
+        const KnowledgeItem& current = database.get(i);
+
+        bruteForceResults.push_back({
+            &current,
+            kdQuery.distanceTo(current.vector)
+        });
+    }
+
+    std::sort(
+        bruteForceResults.begin(),
+        bruteForceResults.end(),
+        [](const NearestResult& a, const NearestResult& b)
+        {
+            return a.distance < b.distance;
+        }
+    );
+
+    assert(kdResults.size() == 3);
+
+    for (std::size_t i = 0; i < kdResults.size(); ++i)
+    {
+        assert(kdResults[i].item->id == bruteForceResults[i].item->id);
+        assert(
+            std::abs(
+                kdResults[i].distance - bruteForceResults[i].distance
+            ) < 1e-9
+        );
+    }
+
+    cout << "KD-tree versus brute-force test passed!" << endl;
+
+
+    // Test 2: na een eerdere zoekopdracht een nieuw item toevoegen.
+    // De volgende zoekopdracht moet de verouderde KD-tree vernieuwen.
+    const Vector newVector{5.0, 6.0, 7.0};
+
+    database.add(newVector, "KD-tree nieuw item");
+
+    const auto updatedResults = database.findNearestK(kdQuery, 1);
+
+    assert(updatedResults.size() == 1);
+    assert(updatedResults[0].item->text == "KD-tree nieuw item");
+    assert(updatedResults[0].distance == 0.0);
+
+    cout << "KD-tree rebuild after add test passed!" << endl;
+
+
+    // Test 3: vraag meer resultaten op dan er items zijn.
+    const auto allResults =
+        database.findNearestK(kdQuery, database.size() + 10);
+
+    assert(allResults.size() == database.size());
+
+    for (std::size_t i = 1; i < allResults.size(); ++i)
+    {
+        assert(allResults[i - 1].distance <= allResults[i].distance);
+    }
+
+    cout << "KD-tree k larger than database size test passed!" << endl;
+    
     return 0;
 }

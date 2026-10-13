@@ -37,6 +37,7 @@ add_executable(VectorDatabaseTest
     src/VectorDatabase.cpp
     src/MaxHeap.cpp
     src/BTree.cpp
+    src/KDTree.cpp
 )
 
 # Als je naar headerbestanden zoek, kijk dan ook in include.
@@ -50,6 +51,18 @@ add_executable(DatabaseStorageTest
     src/VectorDatabase.cpp
     src/MaxHeap.cpp
     src/BTree.cpp
+    src/KDTree.cpp
 )
 
 target_include_directories(DatabaseStorageTest PRIVATE include tests)
+
+
+# KD-tree benchmark
+add_executable(KDTreeBenchmark
+    tests/KDTreeBenchmark.cpp
+    src/Vector.cpp
+    src/KDTree.cpp
+    src/MaxHeap.cpp
+)
+
+target_include_directories(KDTreeBenchmark PRIVATE include)

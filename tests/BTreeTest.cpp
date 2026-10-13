@@ -333,4 +333,47 @@ void runBTreeTests()
 
     cout << "BTree KnowledgeItem range tests passed!" << endl;
 
+    //13-10-2026: Nog een test:
+        // Extra controle: rangequery met meerdere B-tree-splitsingen.
+    BTree splitRangeTree;
+
+    Vector testVector({1.0, 2.0});
+
+    std::vector<KnowledgeItem> testItems;
+    testItems.reserve(10);
+
+    // Bewust in een ongesorteerde volgorde invoegen.
+    const int testIds[] = {50, 30, 70, 10, 40, 60, 80, 20, 35, 45};
+
+    for (int id : testIds)
+    {
+        testItems.emplace_back(id, testVector, "Record " + std::to_string(id));
+        splitRangeTree.insert(id, &testItems.back());
+    }
+
+    const auto splitResults = splitRangeTree.findRange(20, 70);
+
+    const int expectedIds[] = {20, 30, 35, 40, 45, 50, 60, 70};
+
+    if (splitResults.size() != 8)
+    {
+        throw runtime_error(
+            "BTree split range test failed: expected 8 results"
+        );
+    }
+
+    for (std::size_t i = 0; i < splitResults.size(); ++i)
+    {
+        if (splitResults[i] == nullptr ||
+            splitResults[i]->id != expectedIds[i] ||
+            splitResults[i]->text != "Record " + std::to_string(expectedIds[i]))
+        {
+            throw runtime_error(
+                "BTree split range test failed: incorrect item or order"
+            );
+        }
+    }
+
+    cout << "BTree split range test passed!" << endl;
+
 }
