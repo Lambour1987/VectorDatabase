@@ -63,5 +63,16 @@ class VectorDatabase
         //28-8-26: Functie toevoegen
         //8-10-2026: Tijdelijk Aangepast van const std::vector<KnowledgeItem>& getVectors() const; naar
         const std::vector<std::unique_ptr<KnowledgeItem>>& getVectors() const;
+
+        //12-10-26: toegevoegd: rangequeries via de VectorDatabase opvragen
+        std::vector<const KnowledgeItem*> findByIdRange(int minId,int maxId) const;
+
+        //13-10-2026: Toegevoegd:
+        std::vector<NearestResult> findNearestKInIdRange(const Vector& query,size_t k,int minId,int maxId) const;
+
+        
+
+
+
 };
 

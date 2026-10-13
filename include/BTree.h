@@ -48,6 +48,8 @@ public:
     bool contains(int key) const;
     //8-10-2026: Toegevoegd:
     const KnowledgeItem* find(int key) const;
+    //12-10-2026: Toegevoegd voor de rangequery
+    std::vector<const KnowledgeItem*> findRange(int minId,int maxId) const;
     void print() const;
     //7-10-2026: Fucntie om keyNodes te verwijderen
     void remove(int key);
@@ -74,5 +76,9 @@ private:
 
     //8-10-2026: Nieuwe functie
     void insertNonFull(Node* node, int key, KnowledgeItem* item);
+
+    //12-10-2026: Tbv RangeQuery
+    void collectRange(Node* node,int minId,int maxId,std::vector<const KnowledgeItem*>& results) const;
+
 
 };

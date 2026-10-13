@@ -542,3 +542,77 @@ const KnowledgeItem* BTree::find(int key) const
 
     return nullptr;
 }
+
+//12-10-2026: Toegevoegd: Hulpfunctie implementatie queryRange en meteen
+// door chat zelf gewijzigd: 
+// En nog een keer
+// BELANGRIJK: Hier dus wel steeds correcties door chat. Dus dit heel goed testen:
+// En hij zegt dat het toch moet kloppen
+void BTree::collectRange(
+    Node* node,
+    int minId,
+    int maxId,
+    std::vector<const KnowledgeItem*>& results
+) const
+{
+    if(node == nullptr)
+    {
+        return;
+    }
+
+    for(std::size_t i = 0; i < node->entries.size(); i++)
+    {
+        // Bezoek het child links van deze entry als het bereik
+        // daar nog waarden kan bevatten.
+        if(!node->leaf)
+        {
+            bool canContainResults =
+                (i == 0 || node->entries[i - 1].key < maxId) &&
+                node->entries[i].key > minId;
+
+            if(canContainResults)
+            {
+                collectRange(
+                    node->children[i],
+                    minId,
+                    maxId,
+                    results
+                );
+            }
+        }
+
+        // De huidige entry valt binnen het inclusieve bereik.
+        if(node->entries[i].key >= minId &&
+           node->entries[i].key <= maxId)
+        {
+            results.push_back(node->entries[i].item);
+        }
+    }
+
+    // Het laatste child bevat keys groter dan de laatste entry.
+    if(!node->leaf &&
+       !node->entries.empty() &&
+       node->entries.back().key < maxId)
+    {
+        collectRange(
+            node->children.back(),
+            minId,
+            maxId,
+            results
+        );
+    }
+}
+
+std::vector<const KnowledgeItem*> BTree::findRange(int minId,int maxId) const
+{
+    std::vector<const KnowledgeItem*> results;
+
+    if(minId > maxId)
+    {
+        return results;
+    }
+
+    collectRange(root, minId, maxId, results);
+
+    return results;
+}

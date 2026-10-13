@@ -42,7 +42,96 @@ int main()
     assert(!database.containsId(999));
 
     cout << "containsId tests passed!" << endl;
+
+    database.add(Vector{7.0, 8.0, 9.0}, "derde tekst");
+    database.add(Vector{10.0, 11.0, 12.0}, "vierde tekst");
+    database.add(Vector{13.0, 14.0, 15.0}, "vijfde tekst");
+    database.add(Vector{16.0, 17.0, 18.0}, "zesde tekst");
+
     cout << "VectorDatabase tests passed!" << endl;
+
+    const auto results = database.findByIdRange(3, 6);
+
+    if(results.size() != 4)
+    {
+        throw std::runtime_error(
+            "VectorDatabase range test failed: expected 4 records"
+        );
+    }
+
+    for(std::size_t i = 0; i < results.size(); i++)
+    {
+        if(results[i]->id != static_cast<int>(i) + 3)
+        {
+            throw std::runtime_error(
+                "VectorDatabase range test failed: incorrect IDs or order"
+            );
+        }
+    }
+
+    std::cout << "VectorDatabase range tests passed!" << std::endl;
+
+    // Edge case 1: bereik opvragen uit een lege database.
+    VectorDatabase emptyDatabase;
+
+    const auto emptyResults = emptyDatabase.findByIdRange(1, 10);
+
+    assert(emptyResults.empty());
+
+    cout << "Empty database range test passed!" << endl;
+
+
+    // Edge case 2: bereik met precies één bestaand ID.
+    const auto singleResult = database.findByIdRange(3, 3);
+
+    assert(singleResult.size() == 1);
+    assert(singleResult[0]->id == 3);
+
+    cout << "Single ID range test passed!" << endl;
+
+
+    // Edge case 3: bereik buiten alle bestaande IDs.
+    const auto outsideResults = database.findByIdRange(100, 200);
+
+    assert(outsideResults.empty());
+
+    cout << "Outside range test passed!" << endl;
+
+
+    // Edge case 4: bereik met ontbrekende IDs.
+    const auto missingResults = database.findByIdRange(2, 4);
+
+    assert(missingResults.size() == 3);
+    assert(missingResults[0]->id == 2);
+    assert(missingResults[1]->id == 3);
+    assert(missingResults[2]->id == 4);
+
+    cout << "Missing IDs range test passed!" << endl;
+
+    //13-10-2026: toegevoegd
+    
+    // Test: gecombineerde ID-filter en vectorzoekfunctie.
+    Vector query{4.0, 5.0, 6.0};
+
+    const auto nearestResults =
+        database.findNearestKInIdRange(query, 2, 1, 3);
+
+    assert(nearestResults.size() == 2);
+
+    // ID 2 heeft exact dezelfde vector als de query.
+    assert(nearestResults[0].item->id == 2);
+    assert(nearestResults[0].distance == 0.0);
+
+    // ID 1 en ID 3 liggen even ver van de query.
+    // Beide hebben afstand sqrt(27). We controleren daarom
+    // dat het tweede resultaat een van deze twee items is.
+    assert(
+        nearestResults[1].item->id == 1 ||
+        nearestResults[1].item->id == 3
+    );
+
+    cout << "Combined ID range and nearest-K test passed!" << endl;
+
 
     return 0;
 }

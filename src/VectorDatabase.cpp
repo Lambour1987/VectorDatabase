@@ -215,3 +215,81 @@ bool VectorDatabase::containsId(int id) const
 {
     return idIndex.find(id) != nullptr;
 }
+
+//12-10-2026: toegevoegd
+std::vector<const KnowledgeItem*> VectorDatabase::findByIdRange(
+    int minId,
+    int maxId
+) const
+{
+    return idIndex.findRange(minId, maxId);
+}
+
+
+//13-10-2026: Toegevoegd: Filters
+
+std::vector<NearestResult> VectorDatabase::findNearestKInIdRange(
+    const Vector& query,
+    size_t k,
+    int minId,
+    int maxId
+) const
+{
+    if (k == 0)
+    {
+        throw invalid_argument("k must be greater than 0");
+    }
+
+    if (minId > maxId)
+    {
+        throw invalid_argument("minId must not be greater than maxId");
+    }
+
+    // Stap 1: haal alleen de items binnen het ID-bereik op.
+    std::vector<const KnowledgeItem*> candidates =
+        findByIdRange(minId, maxId);
+
+    // Stap 2: controleer of er kandidaten zijn.
+    if (candidates.empty())
+    {
+        return {};
+    }
+
+    // Stap 3: zoek de K dichtstbijzijnde kandidaten.
+    MaxHeap heap;
+
+    for (const KnowledgeItem* item : candidates)
+    {
+        double distance = query.distanceTo(item->vector);
+
+        heap.push({distance, item});
+
+        if (heap.size() > k)
+        {
+            heap.pop();
+        }
+    }
+
+    // Stap 4: zet de heap om naar NearestResult-objecten.
+    std::vector<NearestResult> results;
+
+    while (!heap.empty())
+    {
+        auto result = heap.top();
+
+        if (result.has_value())
+        {
+            results.push_back({
+                result->second,
+                result->first
+            });
+
+            heap.pop();
+        }
+    }
+
+    // De heap levert de resultaten van grootste naar kleinste afstand.
+    reverse(results.begin(), results.end());
+
+    return results;
+}

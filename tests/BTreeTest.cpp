@@ -6,6 +6,8 @@
 
 #include <iostream>
 #include <stdexcept>
+#include "../include/KnowledgeItem.h"
+#include "../include/Vector.h"
 
 using namespace std;
 
@@ -233,4 +235,102 @@ void runBTreeTests()
 
     cout << "\nInternal deletion - after deleting 30:" << endl;
     internalTree.print();
+
+    //12-10-2026: Test:
+        // Range query tests
+    BTree rangeTree;
+
+    rangeTree.insert(10, nullptr);
+    rangeTree.insert(20, nullptr);
+    rangeTree.insert(30, nullptr);
+    rangeTree.insert(40, nullptr);
+    rangeTree.insert(50, nullptr);
+
+    // Gedeeltelijk bereik: 20 en 30.
+    if(rangeTree.findRange(15, 35).size() != 2)
+    {
+        throw runtime_error(
+            "BTree range test failed: expected 2 results for range 15-35"
+        );
+    }
+
+    // Inclusieve grenzen: 20, 30 en 40.
+    if(rangeTree.findRange(20, 40).size() != 3)
+    {
+        throw runtime_error(
+            "BTree range test failed: expected 3 results for range 20-40"
+        );
+    }
+
+    // Exact één ID.
+    if(rangeTree.findRange(30, 30).size() != 1)
+    {
+        throw runtime_error(
+            "BTree range test failed: expected 1 result for range 30-30"
+        );
+    }
+
+    // Geen resultaten.
+    if(!rangeTree.findRange(60, 70).empty())
+    {
+        throw runtime_error(
+            "BTree range test failed: expected no results for range 60-70"
+        );
+    }
+
+    // Ongeldig bereik: minimum groter dan maximum.
+    if(!rangeTree.findRange(40, 20).empty())
+    {
+        throw runtime_error(
+            "BTree range test failed: invalid range should return no results"
+        );
+    }
+
+    cout << "BTree range tests passed!" << endl;
+
+        // Range query test met echte KnowledgeItems
+    Vector vectorA({1.0, 2.0});
+    Vector vectorB({3.0, 4.0});
+    Vector vectorC({5.0, 6.0});
+
+    KnowledgeItem item20(20, vectorA, "Record twintig");
+    KnowledgeItem item30(30, vectorB, "Record dertig");
+    KnowledgeItem item40(40, vectorC, "Record veertig");
+
+    BTree recordTree;
+
+    recordTree.insert(item40.id, &item40);
+    recordTree.insert(item20.id, &item20);
+    recordTree.insert(item30.id, &item30);
+
+    const vector<const KnowledgeItem*> results =
+        recordTree.findRange(20, 40);
+
+    if(results.size() != 3)
+    {
+        throw runtime_error(
+            "BTree range test failed: expected 3 KnowledgeItems"
+        );
+    }
+
+    if(results[0]->id != 20 ||
+       results[1]->id != 30 ||
+       results[2]->id != 40)
+    {
+        throw runtime_error(
+            "BTree range test failed: incorrect IDs or order"
+        );
+    }
+
+    if(results[0]->text != "Record twintig" ||
+       results[1]->text != "Record dertig" ||
+       results[2]->text != "Record veertig")
+    {
+        throw runtime_error(
+            "BTree range test failed: incorrect KnowledgeItems returned"
+        );
+    }
+
+    cout << "BTree KnowledgeItem range tests passed!" << endl;
+
 }
