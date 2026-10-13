@@ -132,6 +132,42 @@ int main()
 
     cout << "Combined ID range and nearest-K test passed!" << endl;
 
+    //13-10-2026: meer tests
+    // Randgeval 1: k = 0 moet een invalid_argument opleveren.
+    bool zeroKThrows = false;
+
+    try {
+        database.findNearestKInIdRange(query, 0, 1, 3);
+    }
+    catch (const std::invalid_argument&) {
+        zeroKThrows = true;
+    }
+
+    assert(zeroKThrows);
+    cout << "Zero-K edge case passed!" << endl;
+
+
+    // Randgeval 2: minId > maxId moet een invalid_argument opleveren.
+    bool invalidRangeThrows = false;
+
+    try {
+        database.findNearestKInIdRange(query, 2, 5, 2);
+    }
+    catch (const std::invalid_argument&) {
+        invalidRangeThrows = true;
+    }
+
+    assert(invalidRangeThrows);
+    cout << "Invalid ID range edge case passed!" << endl;
+
+
+    // Randgeval 3: een geldig bereik zonder matches geeft lege resultaten.
+    const auto noMatches =
+        database.findNearestKInIdRange(query, 2, 100, 200);
+
+    assert(noMatches.empty());
+    cout << "Empty candidate range edge case passed!" << endl;
+
 
     return 0;
 }
