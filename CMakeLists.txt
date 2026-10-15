@@ -66,3 +66,29 @@ add_executable(KDTreeBenchmark
 )
 
 target_include_directories(KDTreeBenchmark PRIVATE include)
+
+
+# RAG Console
+add_executable(RAGConsole
+    src/RAGConsole.cpp
+    src/VectorLoader.cpp
+    src/TextLoader.cpp
+    src/Vector.cpp
+    src/VectorDatabase.cpp
+    src/MaxHeap.cpp
+    src/BTree.cpp
+    src/KDTree.cpp
+)
+
+target_include_directories(RAGConsole PRIVATE
+    include
+    "C:/msys64/mingw64/include"
+)
+
+target_link_directories(RAGConsole PRIVATE
+    "C:/msys64/mingw64/lib"
+)
+
+target_link_libraries(RAGConsole PRIVATE
+    curl
+)
